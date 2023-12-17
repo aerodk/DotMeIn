@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
@@ -21,12 +22,30 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Color selectedColor = Colors.black; // Initial color
+  Color base = Colors.grey;
+  static int rowCount = 12;
+  static int colCount = 12;
 
   // Define a 2D list to hold cell colors
   List<List<Color>> gridColors = List.generate(
-    8,
-    (index) => List.generate(8, (index) => Colors.grey),
+    rowCount,
+    (index) => List.generate(colCount, (index) => Colors.grey),
   );
+
+  // Define a 2D list to hold correct pattern colors
+  List<List<Color>> correctPattern = List.generate(
+    rowCount,
+    (row) => List.generate(colCount,
+        (col) => (row + col).isEven ? Colors.grey : Colors.white),
+  );
+
+  // Define a 2D list to hold whether each cell is correct or not
+  List<List<bool>> correctness = List.generate(
+    rowCount,
+    (index) => List.generate(colCount, (index) => true),
+  );
+
+  bool compareActive = false;
 
   @override
   Widget build(BuildContext context) {
@@ -36,42 +55,131 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
-          SimpleColorPicker(
-            selectedColor: selectedColor,
-            onColorChanged: (color) {
-              setState(() {
-                selectedColor = color;
-              });
-            },
+          Row(
+            children: [
+              buildColorPicker(),
+              buildPreview(),
+            ],
           ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 8, // Justér antallet af kolonner efter behov
-              ),
-              itemBuilder: (context, index) {
-                int row = index ~/ 8; // Beregner rækken baseret på indekset
-                int col = index % 8; // Beregner kolonnen baseret på indekset
-
-                return GestureDetector(
-                  onTap: () {
+          Row(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  compareActive = !compareActive;
+                  if(compareActive) {
+                    comparePatterns();
+                  } else {
+                    correctness = List.generate(rowCount, (index) => List.generate(colCount, (index) => true));
                     setState(() {
-                      // Ændrer farven på den trykkede celle til den valgte farve
-                      gridColors[row][col] = selectedColor;
                     });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.all(2),
-                    color: gridColors[row][col],
-                  ),
-                );
-              },
-              itemCount: gridColors.length * gridColors[0].length,
-            ),
+                  }
+                },
+                child: Text('Sammenlign mønstre'),
+              )
+            ],
           ),
+          buildDotBox(),
         ],
       ),
     );
+  }
+
+  SimpleColorPicker buildColorPicker() {
+    return SimpleColorPicker(
+      selectedColor: selectedColor,
+      onColorChanged: (color) {
+        setState(() {
+          selectedColor = color;
+        });
+      },
+    );
+  }
+
+  Expanded buildDotBox() {
+    return Expanded(
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: colCount, // Justér antallet af kolonner efter behov
+        ),
+        itemBuilder: (context, index) {
+          int row = index ~/ colCount; // Beregner rækken baseret på indekset
+          int col = index % colCount; // Beregner kolonnen baseret på indekset
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                // Ændrer farven på den trykkede celle til den valgte farve
+                if (gridColors[row][col] == selectedColor) {
+                  gridColors[row][col] = base;
+                } else {
+                  gridColors[row][col] = selectedColor;
+                }
+              });
+            },
+            child:
+            Container(
+              margin: EdgeInsets.all(2),
+              color: gridColors[row][col],
+              child: Container(
+                margin: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: gridColors[row][col],
+                  border: !correctness[row][col]
+                      ? Border.all(
+                    color: Colors.red, // Farven på den røde ramme
+                    width: 2.0, // Bredden på den røde ramme
+                  )
+                      : null, // Ingen ramme, hvis farven matcher
+                ),
+              )
+            )
+          );
+        },
+        itemCount: colCount * rowCount,
+      ),
+    );
+  }
+
+  Widget buildPreview() {
+    double previewHeight = MediaQuery.of(context).size.height * 0.33;
+    double previewWidth = MediaQuery.of(context).size.width * 0.33;
+
+    return Container(
+      height: previewHeight,
+      width: previewWidth,
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: colCount,
+        ),
+        itemBuilder: (context, index) {
+          int row = index ~/ colCount;
+          int col = index % colCount;
+
+          // Color patternColor = (row + col).isEven ? Colors.grey : Colors.white;
+
+          return Container(
+            width: previewWidth / colCount,
+            height: previewHeight / rowCount,
+            color: correctPattern[row][col],
+          );
+        },
+        itemCount: rowCount * colCount,
+        physics: NeverScrollableScrollPhysics(),
+      ),
+    );
+  }
+
+  void comparePatterns() {
+    for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        correctness[row][col] =
+            gridColors[row][col] == correctPattern[row][col];
+        if (kDebugMode) {
+          print('$row $col is ${correctness[row][col]}');
+        }
+      }
+    }
+    setState(() {});
   }
 }
 
