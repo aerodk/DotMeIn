@@ -1,5 +1,4 @@
 import 'package:dot_me_in/pattern_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -42,7 +41,6 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Color Fill'),
@@ -104,11 +102,12 @@ class MyHomePageState extends State<MyHomePage> {
       // Opdater gridColors og correctness med de nye rowCount og colCount
       gridColors = List.generate(
         rowCount,
-            (index) => List.generate(colCount, (index) => Colors.grey),
+        (index) => List.generate(colCount, (index) => Colors.grey),
       );
       correctness = resetCompare();
     });
   }
+
   void patternSelect(PatternData patternData) {
     rowCount = patternData.height;
     colCount = patternData.width;
@@ -158,46 +157,95 @@ class MyHomePageState extends State<MyHomePage> {
 
   Expanded buildDotBox() {
     return Expanded(
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: colCount, // Justér antallet af kolonner efter behov
-        ),
-        itemBuilder: (context, index) {
-          int row = index ~/ colCount; // Beregner rækken baseret på indekset
-          int col = index % colCount; // Beregner kolonnen baseret på indekset
+      child: GestureDetector(
+        onTapDown: (details) {
+          RenderBox renderBox = context.findRenderObject() as RenderBox;
+          Offset localPosition = renderBox.globalToLocal(details.globalPosition);
 
-          return GestureDetector(
-              onTap: () {
-                setState(() {
-                  compareActive = false;
-                  resetCompare();
-                  // Ændrer farven på den trykkede celle til den valgte farve
-                  if (gridColors[row][col] == selectedColor) {
-                    gridColors[row][col] = base;
-                  } else {
-                    gridColors[row][col] = selectedColor;
-                  }
-                });
-              },
-              child: Container(
-                  margin: const EdgeInsets.all(2),
-                  color: gridColors[row][col],
-                  child: Container(
-                    margin: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: gridColors[row][col],
-                      border: !correctness[row][col]
-                          ? Border.all(
-                              color: gridColors[row][col] == Colors.red
-                                  ? Colors.black12
-                                  : Colors.red, // Farven på den røde ramme
-                              width: 2.0, // Bredden på den røde ramme
-                            )
-                          : null, // Ingen ramme, hvis farven matcher
-                    ),
-                  )));
+          // Beregn bredden af hver boks baseret på skærmens bredde og antallet af kolonner
+          double boxWidth = MediaQuery.of(context).size.width / colCount;
+
+          // Beregn rækkeindeks baseret på berøringens position
+          int row = (details.localPosition.dy / boxWidth).floor();
+
+          // Beregn kolonneindeks baseret på berøringens position
+          int col = (localPosition.dx / boxWidth).floor();
+
+          if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
+            // Du kan nu bruge 'row' og 'col' til at identificere den trykkede boks
+            // if (kDebugMode) {
+            //   print('Box tapped at: $row, $col');
+            // }
+            setState(() {
+              // Opdater farven på den berørte celle baseret på valgt farve
+              if (gridColors[row][col] == selectedColor) {
+                gridColors[row][col] = base;
+              }
+              else {
+                gridColors[row][col] = selectedColor;
+              }
+            });
+
+          }
         },
-        itemCount: colCount * rowCount,
+        onPanUpdate: (details) {
+          compareActive = false;
+          resetCompare();
+
+          RenderBox renderBox = context.findRenderObject() as RenderBox;
+          Offset localPosition =
+              renderBox.globalToLocal(details.globalPosition);
+
+          // Beregn bredden af hver boks baseret på skærmens bredde og antallet af kolonner
+          double boxWidth = MediaQuery.of(context).size.width / colCount;
+
+// Beregn rækkeindeks baseret på berøringens position
+          int row = (details.localPosition.dy / boxWidth).floor();
+
+// Beregn kolonneindeks baseret på berøringens position
+          int col = (localPosition.dx / boxWidth).floor();
+
+          if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
+            setState(() {
+              // Opdater farven på den berørte celle baseret på valgt farve
+              // if (gridColors[row][col] == selectedColor) {
+              //   gridColors[row][col] = base;
+              // }
+              // else {
+              gridColors[row][col] = selectedColor;
+              // }
+            });
+          }
+        },
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: colCount,
+          ),
+          itemBuilder: (context, index) {
+            int row = index ~/ colCount;
+            int col = index % colCount;
+
+            return Container(
+              margin: const EdgeInsets.all(2),
+              color: gridColors[row][col],
+              child: Container(
+                margin: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: gridColors[row][col],
+                  border: !correctness[row][col]
+                      ? Border.all(
+                          color: gridColors[row][col] == Colors.red
+                              ? Colors.black12
+                              : Colors.red,
+                          width: 2.0,
+                        )
+                      : null,
+                ),
+              ),
+            );
+          },
+          itemCount: colCount * rowCount,
+        ),
       ),
     );
   }
@@ -234,12 +282,10 @@ class MyHomePageState extends State<MyHomePage> {
       for (int col = 0; col < colCount; col++) {
         if (row < selectedPatternData.height &&
             col < selectedPatternData.width) {
-          correctness[row][col] = gridColors[row][col] == selectedPatternData.patternColors[row][col];
+          correctness[row][col] = gridColors[row][col] ==
+              selectedPatternData.patternColors[row][col];
         } else {
           correctness[row][col] = false;
-        }
-        if (kDebugMode) {
-          print('$row $col is ${correctness[row][col]}');
         }
       }
     }
