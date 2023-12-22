@@ -84,7 +84,7 @@ class MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _MyHomePageState() {
+  MyHomePageState() {
     // Initialize
     patternSelect(patternService.getPattern("Solen"));
     resetCompare();
