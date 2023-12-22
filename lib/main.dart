@@ -1,6 +1,6 @@
+import 'package:dot_me_in/pattern_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,32 +23,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Color selectedColor = Colors.black; // Initial color
   Color base = Colors.grey;
-  static int rowCount = 12;
-  static int colCount = 12;
+  int rowCount = 12;
+  int colCount = 12;
+  PatternService patternService = PatternService();
+  PatternData selectedPatternData = PatternData([], 0, 0);
 
   // Define a 2D list to hold cell colors
-  List<List<Color>> gridColors = List.generate(
-    rowCount,
-    (index) => List.generate(colCount, (index) => Colors.grey),
-  );
-
-  // Define a 2D list to hold correct pattern colors
-  List<List<Color>> correctPattern = List.generate(
-    rowCount,
-    (row) => List.generate(colCount,
-        (col) => (row + col).isEven ? Colors.grey : Colors.white),
-  );
+  late List<List<Color>> gridColors;
 
   // Define a 2D list to hold whether each cell is correct or not
-  List<List<bool>> correctness = List.generate(
-    rowCount,
-    (index) => List.generate(colCount, (index) => true),
-  );
+  late List<List<bool>> correctness;
 
   bool compareActive = false;
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Color Fill'),
@@ -66,21 +56,88 @@ class _MyHomePageState extends State<MyHomePage> {
               ElevatedButton(
                 onPressed: () {
                   compareActive = !compareActive;
-                  if(compareActive) {
+                  if (compareActive) {
                     comparePatterns();
                   } else {
-                    correctness = List.generate(rowCount, (index) => List.generate(colCount, (index) => true));
-                    setState(() {
-                    });
+                    resetCompare();
+                    setState(() {});
                   }
                 },
                 child: Text('Sammenlign mønstre'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Åbn dialogen for at vælge mønster
+                  showPatternDialog();
+                },
+                child: Text('Vælg mønster'),
               )
             ],
           ),
           buildDotBox(),
         ],
       ),
+    );
+  }
+
+  _MyHomePageState() {
+    // Initialize
+    patternSelect(patternService.getPattern("Solen"));
+    resetCompare();
+  }
+
+  List<List<bool>> resetCompare() {
+    return correctness = List.generate(
+        rowCount, (index) => List.generate(colCount, (index) => true));
+  }
+
+  void setPattern(PatternData patternData) {
+    setState(() {
+      patternSelect(patternData);
+      // Opdater rowCount og colCount her, så de har de rigtige værdier
+      rowCount = patternData.height;
+      colCount = patternData.width;
+      // Opdater gridColors og correctness med de nye rowCount og colCount
+      gridColors = List.generate(
+        rowCount,
+            (index) => List.generate(colCount, (index) => Colors.grey),
+      );
+      correctness = resetCompare();
+    });
+  }
+  void patternSelect(PatternData patternData) {
+    rowCount = patternData.height;
+    colCount = patternData.width;
+    selectedPatternData = patternData;
+    gridColors = List.generate(
+      rowCount,
+      (index) => List.generate(colCount, (index) => Colors.grey),
+    );
+  }
+
+  void showPatternDialog() {
+    List<String> availablePatterns = patternService.getAvailablePatterns();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text('Vælg mønster'),
+          children: [
+            for (String patternName in availablePatterns)
+              ListTile(
+                title: Text(patternName),
+                onTap: () {
+                  resetCompare();
+                  setPattern(patternService.getPattern(patternName));
+                  compareActive = false;
+                  Navigator.pop(context);
+                },
+              ),
+            // Tilføj eventuelle andre mønstre her
+          ],
+        );
+      },
     );
   }
 
@@ -106,34 +163,35 @@ class _MyHomePageState extends State<MyHomePage> {
           int col = index % colCount; // Beregner kolonnen baseret på indekset
 
           return GestureDetector(
-            onTap: () {
-              setState(() {
-                // Ændrer farven på den trykkede celle til den valgte farve
-                if (gridColors[row][col] == selectedColor) {
-                  gridColors[row][col] = base;
-                } else {
-                  gridColors[row][col] = selectedColor;
-                }
-              });
-            },
-            child:
-            Container(
-              margin: EdgeInsets.all(2),
-              color: gridColors[row][col],
+              onTap: () {
+                setState(() {
+                  compareActive = false;
+                  resetCompare();
+                  // Ændrer farven på den trykkede celle til den valgte farve
+                  if (gridColors[row][col] == selectedColor) {
+                    gridColors[row][col] = base;
+                  } else {
+                    gridColors[row][col] = selectedColor;
+                  }
+                });
+              },
               child: Container(
-                margin: EdgeInsets.all(2),
-                decoration: BoxDecoration(
+                  margin: EdgeInsets.all(2),
                   color: gridColors[row][col],
-                  border: !correctness[row][col]
-                      ? Border.all(
-                    color: Colors.red, // Farven på den røde ramme
-                    width: 2.0, // Bredden på den røde ramme
-                  )
-                      : null, // Ingen ramme, hvis farven matcher
-                ),
-              )
-            )
-          );
+                  child: Container(
+                    margin: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: gridColors[row][col],
+                      border: !correctness[row][col]
+                          ? Border.all(
+                              color: gridColors[row][col] == Colors.red
+                                  ? Colors.black12
+                                  : Colors.red, // Farven på den røde ramme
+                              width: 2.0, // Bredden på den røde ramme
+                            )
+                          : null, // Ingen ramme, hvis farven matcher
+                    ),
+                  )));
         },
         itemCount: colCount * rowCount,
       ),
@@ -141,29 +199,27 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget buildPreview() {
-    double previewHeight = MediaQuery.of(context).size.height * 0.33;
-    double previewWidth = MediaQuery.of(context).size.width * 0.33;
+    int width = selectedPatternData.width > 0 ? selectedPatternData.width : 1;
+    int height =
+        selectedPatternData.height > 0 ? selectedPatternData.height : 1;
 
     return Container(
-      height: previewHeight,
-      width: previewWidth,
+      height: height.toDouble() * 20.0,
+      width: width.toDouble() * 20.0,
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: colCount,
+          crossAxisCount: width,
         ),
         itemBuilder: (context, index) {
-          int row = index ~/ colCount;
-          int col = index % colCount;
-
-          // Color patternColor = (row + col).isEven ? Colors.grey : Colors.white;
+          int row = index ~/ width;
+          int col = index % width;
 
           return Container(
-            width: previewWidth / colCount,
-            height: previewHeight / rowCount,
-            color: correctPattern[row][col],
+            margin: EdgeInsets.all(2),
+            color: selectedPatternData.patternColors[row][col],
           );
         },
-        itemCount: rowCount * colCount,
+        itemCount: height * width,
         physics: NeverScrollableScrollPhysics(),
       ),
     );
@@ -172,8 +228,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void comparePatterns() {
     for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
-        correctness[row][col] =
-            gridColors[row][col] == correctPattern[row][col];
+        if (row < selectedPatternData.height &&
+            col < selectedPatternData.width) {
+          correctness[row][col] = gridColors[row][col] == selectedPatternData.patternColors[row][col];
+        } else {
+          correctness[row][col] = false;
+        }
         if (kDebugMode) {
           print('$row $col is ${correctness[row][col]}');
         }
@@ -196,7 +256,7 @@ class SimpleColorPicker extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _ColorCircle(Colors.black, onColorChanged, selectedColor),
-        _ColorCircle(Colors.white, onColorChanged, selectedColor),
+        _ColorCircle(Colors.white54, onColorChanged, selectedColor),
         _ColorCircle(Colors.red, onColorChanged, selectedColor),
         _ColorCircle(Colors.green, onColorChanged, selectedColor),
         _ColorCircle(Colors.blue, onColorChanged, selectedColor),
