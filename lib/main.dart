@@ -24,7 +24,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
-  Color selectedColor = Colors.black; // Initial color
+  Color selectedColor = Colors.white54; // Initial color
   Color base = Colors.grey;
   int rowCount = 12;
   int colCount = 12;
@@ -43,7 +43,7 @@ class MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Color Fill'),
+        title: const Text('DotMeIn'),
       ),
       body: Column(
         children: [
