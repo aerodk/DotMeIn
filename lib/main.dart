@@ -1,4 +1,6 @@
 import 'package:dot_me_in/pattern_service.dart';
+import 'package:dot_me_in/star_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -39,6 +41,8 @@ class MyHomePageState extends State<MyHomePage> {
 
   bool compareActive = false;
 
+  bool activateStar = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +80,16 @@ class MyHomePageState extends State<MyHomePage> {
               )
             ],
           ),
+          if (kDebugMode)
+            ElevatedButton(
+              onPressed: () {
+                // Activate star animation
+                setState(() {
+                  activateStar = !activateStar;
+                });
+              },
+              child: Text('Start Star Animation'),
+            ),
           buildDotBox(),
         ],
       ),
@@ -158,36 +172,6 @@ class MyHomePageState extends State<MyHomePage> {
   Expanded buildDotBox() {
     return Expanded(
       child: GestureDetector(
-        onTapDown: (details) {
-          RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(details.globalPosition);
-
-          // Beregn bredden af hver boks baseret på skærmens bredde og antallet af kolonner
-          double boxWidth = MediaQuery.of(context).size.width / colCount;
-
-          // Beregn rækkeindeks baseret på berøringens position
-          int row = (details.localPosition.dy / boxWidth).floor();
-
-          // Beregn kolonneindeks baseret på berøringens position
-          int col = (localPosition.dx / boxWidth).floor();
-
-          if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
-            // Du kan nu bruge 'row' og 'col' til at identificere den trykkede boks
-            // if (kDebugMode) {
-            //   print('Box tapped at: $row, $col');
-            // }
-            setState(() {
-              // Opdater farven på den berørte celle baseret på valgt farve
-              if (gridColors[row][col] == selectedColor) {
-                gridColors[row][col] = base;
-              }
-              else {
-                gridColors[row][col] = selectedColor;
-              }
-            });
-
-          }
-        },
         onPanUpdate: (details) {
           compareActive = false;
           resetCompare();
@@ -199,21 +183,21 @@ class MyHomePageState extends State<MyHomePage> {
           // Beregn bredden af hver boks baseret på skærmens bredde og antallet af kolonner
           double boxWidth = MediaQuery.of(context).size.width / colCount;
 
-// Beregn rækkeindeks baseret på berøringens position
+          // Beregn rækkeindeks baseret på berøringens position
           int row = (details.localPosition.dy / boxWidth).floor();
 
-// Beregn kolonneindeks baseret på berøringens position
+          // Beregn kolonneindeks baseret på berøringens position
           int col = (localPosition.dx / boxWidth).floor();
 
           if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
             setState(() {
               // Opdater farven på den berørte celle baseret på valgt farve
-              // if (gridColors[row][col] == selectedColor) {
-              //   gridColors[row][col] = base;
-              // }
-              // else {
-              gridColors[row][col] = selectedColor;
-              // }
+              if (activateStar && gridColors[row][col] == Colors.white54) {
+                // Vis stjerne i boksen, hvis farven er white54
+                gridColors[row][col] = Colors.transparent;
+              } else {
+                gridColors[row][col] = selectedColor;
+              }
             });
           }
         },
@@ -225,24 +209,26 @@ class MyHomePageState extends State<MyHomePage> {
             int row = index ~/ colCount;
             int col = index % colCount;
 
-            return Container(
-              margin: const EdgeInsets.all(2),
-              color: gridColors[row][col],
-              child: Container(
-                margin: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: gridColors[row][col],
-                  border: !correctness[row][col]
-                      ? Border.all(
-                          color: gridColors[row][col] == Colors.red
-                              ? Colors.black12
-                              : Colors.red,
-                          width: 2.0,
-                        )
-                      : null,
-                ),
-              ),
-            );
+            return activateStar && gridColors[row][col] == Colors.white54
+                ? StarWidget()
+                : Container(
+                    margin: const EdgeInsets.all(2),
+                    color: gridColors[row][col],
+                    child: Container(
+                      margin: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: gridColors[row][col],
+                        border: !correctness[row][col]
+                            ? Border.all(
+                                color: gridColors[row][col] == Colors.red
+                                    ? Colors.black12
+                                    : Colors.red,
+                                width: 2.0,
+                              )
+                            : null,
+                      ),
+                    ),
+                  );
           },
           itemCount: colCount * rowCount,
         ),
