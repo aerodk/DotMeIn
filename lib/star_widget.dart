@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class StarWidget extends StatelessWidget {
+  const StarWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: StarPainter(),
-      size: Size(40, 40), // Juster størrelsen efter dine præferencer
+      size: const Size(40, 40), // Juster størrelsen efter dine præferencer
     );
   }
 }

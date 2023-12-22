@@ -88,7 +88,7 @@ class MyHomePageState extends State<MyHomePage> {
                   activateStar = !activateStar;
                 });
               },
-              child: Text('Start Star Animation'),
+              child: const Text('Start Star Animation'),
             ),
           buildDotBox(),
         ],
@@ -210,7 +210,7 @@ class MyHomePageState extends State<MyHomePage> {
             int col = index % colCount;
 
             return activateStar && gridColors[row][col] == Colors.white54
-                ? StarWidget()
+                ? const StarWidget()
                 : Container(
                     margin: const EdgeInsets.all(2),
                     color: gridColors[row][col],

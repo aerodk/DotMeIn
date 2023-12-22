@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class StarAnimationScreen extends StatefulWidget {
   final Size canvasSize;
 
-  StarAnimationScreen({required this.canvasSize});
+  const StarAnimationScreen({super.key, required this.canvasSize});
 
   @override
   _StarAnimationScreenState createState() => _StarAnimationScreenState();
@@ -23,7 +23,7 @@ class _StarAnimationScreenState extends State<StarAnimationScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     );
 
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller);
@@ -35,7 +35,7 @@ class _StarAnimationScreenState extends State<StarAnimationScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Star Animation'),
+        title: const Text('Star Animation'),
       ),
       body: AnimatedBuilder(
         animation: _animation,
