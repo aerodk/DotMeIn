@@ -3,24 +3,28 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   Color selectedColor = Colors.black; // Initial color
   Color base = Colors.grey;
   int rowCount = 12;
@@ -41,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Color Fill'),
+        title: const Text('Color Fill'),
       ),
       body: Column(
         children: [
@@ -63,14 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     setState(() {});
                   }
                 },
-                child: Text('Sammenlign mønstre'),
+                child: const Text('Sammenlign mønstre'),
               ),
               ElevatedButton(
                 onPressed: () {
                   // Åbn dialogen for at vælge mønster
                   showPatternDialog();
                 },
-                child: Text('Vælg mønster'),
+                child: const Text('Vælg mønster'),
               )
             ],
           ),
@@ -80,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _MyHomePageState() {
+  MyHomePageState() {
     // Initialize
     patternSelect(patternService.getPattern("Solen"));
     resetCompare();
@@ -122,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: Text('Vælg mønster'),
+          title: const Text('Vælg mønster'),
           children: [
             for (String patternName in availablePatterns)
               ListTile(
@@ -176,10 +180,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               },
               child: Container(
-                  margin: EdgeInsets.all(2),
+                  margin: const EdgeInsets.all(2),
                   color: gridColors[row][col],
                   child: Container(
-                    margin: EdgeInsets.all(2),
+                    margin: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       color: gridColors[row][col],
                       border: !correctness[row][col]
@@ -203,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
     int height =
         selectedPatternData.height > 0 ? selectedPatternData.height : 1;
 
-    return Container(
+    return SizedBox(
       height: height.toDouble() * 20.0,
       width: width.toDouble() * 20.0,
       child: GridView.builder(
@@ -215,12 +219,12 @@ class _MyHomePageState extends State<MyHomePage> {
           int col = index % width;
 
           return Container(
-            margin: EdgeInsets.all(2),
+            margin: const EdgeInsets.all(2),
             color: selectedPatternData.patternColors[row][col],
           );
         },
         itemCount: height * width,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
       ),
     );
   }
@@ -247,8 +251,8 @@ class SimpleColorPicker extends StatelessWidget {
   final Color selectedColor;
   final Function(Color) onColorChanged;
 
-  SimpleColorPicker(
-      {required this.selectedColor, required this.onColorChanged});
+  const SimpleColorPicker(
+      {super.key, required this.selectedColor, required this.onColorChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +278,7 @@ class _ColorCircle extends StatelessWidget {
   final Function(Color) onColorChanged;
   final Color selectedColor;
 
-  _ColorCircle(this.color, this.onColorChanged, this.selectedColor);
+  const _ColorCircle(this.color, this.onColorChanged, this.selectedColor);
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +289,7 @@ class _ColorCircle extends StatelessWidget {
       child: Container(
         width: 40,
         height: 40,
-        margin: EdgeInsets.all(8),
+        margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: color,
