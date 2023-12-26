@@ -34,3 +34,16 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
+
+      - name: Move to Publish Repository
+        if: github.ref == 'refs/heads/main' && success()
+        run: |
+          git clone https://github.com/aerodk/aerodk.github.io.git tmp-repo
+          cd tmp-repo
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git switch -c "release-dotmein-${{ github.sha }}"
+          cp -r ../build/web/* DotMeIn/
+          git add --all .
+          git commit -m "Release @ $(date +'%Y%m%d%H%M%S')_${{ github.run_number }}"
+          git push
