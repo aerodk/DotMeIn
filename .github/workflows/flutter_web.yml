@@ -42,6 +42,7 @@ jobs:
           cd tmp-repo
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git remote set-url origin https://github.com/aerodk/aerodk.github.io.git
           git switch -c "release-dotmein-${{ github.sha }}"
           cp -r ../build/web/* DotMeIn/
           git add --all .
