@@ -38,10 +38,10 @@ jobs:
       - name: Move to Publish Repository
         if: github.ref == 'refs/heads/main' && success()
         run: |
+          git clone https://github.com/aerodk/aerodk.github.io.git tmp-repo
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git remote add destination_repo https://github.com/aerodk/aerodk.github.io.git        
-          git clone https://github.com/aerodk/aerodk.github.io.git tmp-repo
           cd tmp-repo
           git switch -c "release-dotmein-$(date +'%Y%m%d%H%M%S')"
           cp -r ../build/web/* DotMeIn/
