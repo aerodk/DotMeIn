@@ -38,7 +38,7 @@ class MyHomePageState extends State<MyHomePage> {
   late List<List<bool>> correctness;
 
   bool compareActive = false;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +160,6 @@ class MyHomePageState extends State<MyHomePage> {
     return Expanded(
       child: GestureDetector(
         onTapDown: (details) {
-          RenderBox renderBox = context.findRenderObject() as RenderBox;
           double scrollOffset = _scrollController.offset;
           double adjustedY = details.localPosition.dy + scrollOffset;
 
