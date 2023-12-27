@@ -26,7 +26,7 @@ jobs:
           flutter pub get
 
       - name: Build
-        run: flutter build web --web-renderer canvaskit
+        run: flutter build web --web-renderer canvaskit --base-href "/dot/"
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
@@ -43,7 +43,7 @@ jobs:
           git config --local user.name "GitHub Action"
           cd tmp-repo
           git switch -c "release-dotmein-$(date +'%Y%m%d%H%M%S')"
-          cp -r ../build/web/* DotMeIn/
+          cp -r ../build/web/* dot/
           git add --all .
           git commit -m "Release @ $(date +'%Y%m%d%H%M%S')_${{ github.run_number }}"
           git push --set-upstream origin "release-dotmein-${{ github.sha }}" 
