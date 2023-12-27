@@ -48,7 +48,7 @@ class MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
-          Row(
+          Wrap(
             children: [
               buildColorPicker(),
               buildPreview(),
@@ -82,6 +82,7 @@ class MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
 
   MyHomePageState() {
     // Initialize
@@ -295,13 +296,17 @@ class SimpleColorPicker extends StatelessWidget {
   final Color selectedColor;
   final Function(Color) onColorChanged;
 
-  const SimpleColorPicker(
-      {super.key, required this.selectedColor, required this.onColorChanged});
+  const SimpleColorPicker({
+    super.key,
+    required this.selectedColor,
+    required this.onColorChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8.0, // Juster afstanden mellem farvecirklerne efter behov
       children: [
         _ColorCircle(Colors.black, onColorChanged, selectedColor),
         _ColorCircle(Colors.white54, onColorChanged, selectedColor),
@@ -316,6 +321,7 @@ class SimpleColorPicker extends StatelessWidget {
     );
   }
 }
+
 
 class _ColorCircle extends StatelessWidget {
   final Color color;
