@@ -9,10 +9,10 @@ class StarAnimationScreen extends StatefulWidget {
   const StarAnimationScreen({super.key, required this.canvasSize});
 
   @override
-  _StarAnimationScreenState createState() => _StarAnimationScreenState();
+  StarAnimationScreenState createState() => StarAnimationScreenState();
 }
 
-class _StarAnimationScreenState extends State<StarAnimationScreen>
+class StarAnimationScreenState extends State<StarAnimationScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
