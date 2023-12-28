@@ -44,6 +44,6 @@ jobs:
           cd tmp-repo
           git switch -c "release-dotmein-$(date +'%Y%m%d%H%M%S')"
           cp -r ../build/web/* dot/
-          git add --all .
+          git add .
           git commit -m "Release @ $(date +'%Y%m%d%H%M%S')_${{ github.run_number }}"
-          git push --set-upstream origin "release-dotmein-${{ github.sha }}" 
+          git push --set-upstream origin "release-dotmein-$(date +'%Y%m%d%H%M%S')"
