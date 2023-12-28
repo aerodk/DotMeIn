@@ -148,7 +148,7 @@ class MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   resetCompare();
                   setPattern(patternService.getPattern(patternName));
-                  compareActive = false;
+                  compareActive = activateStar = false;
                   Navigator.pop(context);
                 },
               ),
