@@ -97,7 +97,6 @@ class MyHomePageState extends State<MyHomePage> {
     );
   }
 
-
   MyHomePageState() {
     // Initialize
     patternSelect(patternService.getPattern("Solen"));
@@ -188,10 +187,6 @@ class MyHomePageState extends State<MyHomePage> {
           int col = (details.localPosition.dx / boxWidth).floor();
 
           if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
-            // Du kan nu bruge 'row' og 'col' til at identificere den trykkede boks
-            // if (kDebugMode) {
-            //   print('Box tapped at: $row, $col');
-            // }
             setState(() {
               // Opdater farven på den berørte celle baseret på valgt farve
               if (gridColors[row][col] == selectedColor) {
@@ -201,6 +196,12 @@ class MyHomePageState extends State<MyHomePage> {
               }
             });
           }
+        },
+        onPanEnd: (_) {
+          compareForCorrect();
+        },
+        onTapUp: (_) {
+          compareForCorrect();
         },
         onPanUpdate: (details) {
           compareActive = false;
@@ -306,6 +307,26 @@ class MyHomePageState extends State<MyHomePage> {
     }
     setState(() {});
   }
+
+  void compareForCorrect() {
+    for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        if (row < selectedPatternData.height &&
+            col < selectedPatternData.width) {
+          if (!(gridColors[row][col] ==
+              selectedPatternData.patternColors[row][col])) {
+            setState(() {
+              activateStar = false;
+            });
+            return;
+          }
+        }
+      }
+    }
+    setState(() {
+      activateStar = true;
+    });
+  }
 }
 
 class SimpleColorPicker extends StatelessWidget {
@@ -337,7 +358,6 @@ class SimpleColorPicker extends StatelessWidget {
     );
   }
 }
-
 
 class _ColorCircle extends StatelessWidget {
   final Color color;
