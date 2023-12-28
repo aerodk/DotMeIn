@@ -1,4 +1,6 @@
 import 'package:dot_me_in/pattern_service.dart';
+import 'package:dot_me_in/star_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -40,6 +42,8 @@ class MyHomePageState extends State<MyHomePage> {
   bool compareActive = false;
   final ScrollController _scrollController = ScrollController();
 
+  bool activateStar = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,12 +81,21 @@ class MyHomePageState extends State<MyHomePage> {
               )
             ],
           ),
+          if (kDebugMode)
+            ElevatedButton(
+              onPressed: () {
+                // Activate star animation
+                setState(() {
+                  activateStar = !activateStar;
+                });
+              },
+              child: const Text('Start Star Animation'),
+            ),
           buildDotBox(),
         ],
       ),
     );
   }
-
 
   MyHomePageState() {
     // Initialize
@@ -135,7 +148,7 @@ class MyHomePageState extends State<MyHomePage> {
                 onTap: () {
                   resetCompare();
                   setPattern(patternService.getPattern(patternName));
-                  compareActive = false;
+                  compareActive = activateStar = false;
                   Navigator.pop(context);
                 },
               ),
@@ -174,10 +187,6 @@ class MyHomePageState extends State<MyHomePage> {
           int col = (details.localPosition.dx / boxWidth).floor();
 
           if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
-            // Du kan nu bruge 'row' og 'col' til at identificere den trykkede boks
-            // if (kDebugMode) {
-            //   print('Box tapped at: $row, $col');
-            // }
             setState(() {
               // Opdater farven på den berørte celle baseret på valgt farve
               if (gridColors[row][col] == selectedColor) {
@@ -187,6 +196,12 @@ class MyHomePageState extends State<MyHomePage> {
               }
             });
           }
+        },
+        onPanEnd: (_) {
+          compareForCorrect();
+        },
+        onTapUp: (_) {
+          compareForCorrect();
         },
         onPanUpdate: (details) {
           compareActive = false;
@@ -224,24 +239,26 @@ class MyHomePageState extends State<MyHomePage> {
             int row = index ~/ colCount;
             int col = index % colCount;
 
-            return Container(
-              margin: const EdgeInsets.all(2),
-              color: gridColors[row][col],
-              child: Container(
-                margin: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: gridColors[row][col],
-                  border: !correctness[row][col]
-                      ? Border.all(
-                          color: gridColors[row][col] == Colors.red
-                              ? Colors.black12
-                              : Colors.red,
-                          width: 2.0,
-                        )
-                      : null,
-                ),
-              ),
-            );
+            return activateStar && gridColors[row][col] == Colors.white54
+                ? const StarWidget()
+                : Container(
+                    margin: const EdgeInsets.all(2),
+                    color: gridColors[row][col],
+                    child: Container(
+                      margin: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: gridColors[row][col],
+                        border: !correctness[row][col]
+                            ? Border.all(
+                                color: gridColors[row][col] == Colors.red
+                                    ? Colors.black12
+                                    : Colors.red,
+                                width: 2.0,
+                              )
+                            : null,
+                      ),
+                    ),
+                  );
           },
           itemCount: colCount * rowCount,
         ),
@@ -290,6 +307,26 @@ class MyHomePageState extends State<MyHomePage> {
     }
     setState(() {});
   }
+
+  void compareForCorrect() {
+    for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        if (row < selectedPatternData.height &&
+            col < selectedPatternData.width) {
+          if (!(gridColors[row][col] ==
+              selectedPatternData.patternColors[row][col])) {
+            setState(() {
+              activateStar = false;
+            });
+            return;
+          }
+        }
+      }
+    }
+    setState(() {
+      activateStar = true;
+    });
+  }
 }
 
 class SimpleColorPicker extends StatelessWidget {
@@ -321,7 +358,6 @@ class SimpleColorPicker extends StatelessWidget {
     );
   }
 }
-
 
 class _ColorCircle extends StatelessWidget {
   final Color color;
