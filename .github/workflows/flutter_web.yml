@@ -45,6 +45,6 @@ jobs:
           git switch -c "release-dotmein-$(date +'%Y%m%d%H%M%S')"
           cp -r ../build/web/* dot/
           git add .
-          git remote set-url origin https://${{ secrets.GITHUB_TOKEN}}@github.com/aerodk/aerodk.github.io.git
+          git remote set-url origin https://aerodk:${{ secrets.GITHUB_TOKEN}}@github.com/aerodk/aerodk.github.io.git
           git commit -m "Release @ $(date +'%Y%m%d%H%M%S')_${{ github.run_number }}"
           git push --set-upstream origin "release-dotmein-$(date +'%Y%m%d%H%M%S')"
