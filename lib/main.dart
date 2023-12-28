@@ -38,6 +38,7 @@ class MyHomePageState extends State<MyHomePage> {
   late List<List<bool>> correctness;
 
   bool compareActive = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class MyHomePageState extends State<MyHomePage> {
       ),
       body: Column(
         children: [
-          Row(
+          Wrap(
             children: [
               buildColorPicker(),
               buildPreview(),
@@ -81,6 +82,7 @@ class MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
 
   MyHomePageState() {
     // Initialize
@@ -159,17 +161,17 @@ class MyHomePageState extends State<MyHomePage> {
     return Expanded(
       child: GestureDetector(
         onTapDown: (details) {
-          RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+          double scrollOffset = _scrollController.offset;
+          double adjustedY = details.localPosition.dy + scrollOffset;
 
           // Beregn bredden af hver boks baseret på skærmens bredde og antallet af kolonner
           double boxWidth = MediaQuery.of(context).size.width / colCount;
 
           // Beregn rækkeindeks baseret på berøringens position
-          int row = (details.localPosition.dy / boxWidth).floor();
+          int row = (adjustedY / boxWidth).floor();
 
           // Beregn kolonneindeks baseret på berøringens position
-          int col = (localPosition.dx / boxWidth).floor();
+          int col = (details.localPosition.dx / boxWidth).floor();
 
           if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
             // Du kan nu bruge 'row' og 'col' til at identificere den trykkede boks
@@ -180,12 +182,10 @@ class MyHomePageState extends State<MyHomePage> {
               // Opdater farven på den berørte celle baseret på valgt farve
               if (gridColors[row][col] == selectedColor) {
                 gridColors[row][col] = base;
-              }
-              else {
+              } else {
                 gridColors[row][col] = selectedColor;
               }
             });
-
           }
         },
         onPanUpdate: (details) {
@@ -198,9 +198,12 @@ class MyHomePageState extends State<MyHomePage> {
 
           // Beregn bredden af hver boks baseret på skærmens bredde og antallet af kolonner
           double boxWidth = MediaQuery.of(context).size.width / colCount;
+// Adjust for scroll position
+          double scrollOffset = _scrollController.offset;
+          double adjustedY = details.localPosition.dy + scrollOffset;
 
 // Beregn rækkeindeks baseret på berøringens position
-          int row = (details.localPosition.dy / boxWidth).floor();
+          int row = (adjustedY / boxWidth).floor();
 
 // Beregn kolonneindeks baseret på berøringens position
           int col = (localPosition.dx / boxWidth).floor();
@@ -208,16 +211,12 @@ class MyHomePageState extends State<MyHomePage> {
           if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
             setState(() {
               // Opdater farven på den berørte celle baseret på valgt farve
-              // if (gridColors[row][col] == selectedColor) {
-              //   gridColors[row][col] = base;
-              // }
-              // else {
               gridColors[row][col] = selectedColor;
-              // }
             });
           }
         },
         child: GridView.builder(
+          controller: _scrollController,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: colCount,
           ),
@@ -297,13 +296,17 @@ class SimpleColorPicker extends StatelessWidget {
   final Color selectedColor;
   final Function(Color) onColorChanged;
 
-  const SimpleColorPicker(
-      {super.key, required this.selectedColor, required this.onColorChanged});
+  const SimpleColorPicker({
+    super.key,
+    required this.selectedColor,
+    required this.onColorChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8.0, // Juster afstanden mellem farvecirklerne efter behov
       children: [
         _ColorCircle(Colors.black, onColorChanged, selectedColor),
         _ColorCircle(Colors.white54, onColorChanged, selectedColor),
@@ -318,6 +321,7 @@ class SimpleColorPicker extends StatelessWidget {
     );
   }
 }
+
 
 class _ColorCircle extends StatelessWidget {
   final Color color;
