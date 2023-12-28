@@ -39,8 +39,8 @@ jobs:
         if: github.ref == 'refs/heads/main' && success()
         run: |
           git clone https://github.com/aerodk/aerodk.github.io.git tmp-repo
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
           cd tmp-repo
           git switch -c "release-dotmein-$(date +'%Y%m%d%H%M%S')"
           cp -r ../build/web/* dot/
