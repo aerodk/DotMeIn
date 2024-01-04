@@ -3,18 +3,22 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class StarWidget extends StatelessWidget {
-  const StarWidget({super.key});
+  final double animationValue;
+
+  const StarWidget({Key? key, required this.animationValue}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: StarPainter(),
-      size: const Size(40, 40), // Juster størrelsen efter dine præferencer
+      painter: StarPainter(animationValue),
+      size: const Size(40, 40),
     );
   }
 }
 
 class StarPainter extends CustomPainter {
+  final double animationValue;
+  StarPainter(this.animationValue);
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()..color = Colors.yellow;
@@ -24,7 +28,7 @@ class StarPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
   }
 
@@ -35,8 +39,16 @@ class StarPainter extends CustomPainter {
 
     double radius = size.width / 3;
 
+    // Rotate the star based on animation value
+    double rotation = 1 * pi * animationValue;
+
     double angle = 0;
 
+    // Apply rotation to the canvas
+    canvas.save();
+    canvas.translate(centerX, centerY);
+
+    canvas.rotate(rotation);
     Path path = Path();
 
     for (int i = 0; i < 5; i++) {
@@ -62,5 +74,8 @@ class StarPainter extends CustomPainter {
     path.close();
 
     canvas.drawPath(path, paint);
+
+    // Restore the canvas to its original state
+    canvas.restore();
   }
 }

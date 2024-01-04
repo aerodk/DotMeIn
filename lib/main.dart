@@ -25,7 +25,10 @@ class MyHomePage extends StatefulWidget {
   MyHomePageState createState() => MyHomePageState();
 }
 
-class MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin  {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
   Color selectedColor = Colors.white54; // Initial color
   Color base = Colors.grey;
   int rowCount = 12;
@@ -43,6 +46,33 @@ class MyHomePageState extends State<MyHomePage> {
   final ScrollController _scrollController = ScrollController();
 
   bool activateStar = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2), // Juster varigheden efter dine præferencer
+    );
+
+    // Lyt efter ændringer i status
+    // _controller.addStatusListener((status) {
+    //   if (status == AnimationStatus.completed) {
+    //     Hvis animationen er færdig, nulstil og start igen
+        // _controller.reset();
+        // _controller.forward();
+      // }
+    // });
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_controller);
+    _controller.repeat(reverse: true);
+  }
+
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +270,10 @@ class MyHomePageState extends State<MyHomePage> {
             int col = index % colCount;
 
             return activateStar && gridColors[row][col] == Colors.white54
-                ? const StarWidget()
+                ? AnimatedBuilder(animation: _animation,
+                builder: (context, build) { return
+                  CustomPaint(painter: StarPainter(_animation.value), size: Size(40,40));
+                  } )
                 : Container(
                     margin: const EdgeInsets.all(2),
                     color: gridColors[row][col],
