@@ -272,7 +272,7 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
             return activateStar && gridColors[row][col] == Colors.white54
                 ? AnimatedBuilder(animation: _animation,
                 builder: (context, build) { return
-                  CustomPaint(painter: StarPainter(_animation.value), size: Size(40,40));
+                  CustomPaint(painter: StarPainter(_animation.value), size: const Size(40,40));
                   } )
                 : Container(
                     margin: const EdgeInsets.all(2),
