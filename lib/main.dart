@@ -1,6 +1,5 @@
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -111,16 +110,16 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
               )
             ],
           ),
-          if (kDebugMode)
-            ElevatedButton(
-              onPressed: () {
-                // Activate star animation
-                setState(() {
-                  activateStar = !activateStar;
-                });
-              },
-              child: const Text('Start Star Animation'),
-            ),
+          // if (kDebugMode)
+          //   ElevatedButton(
+          //     onPressed: () {
+          //       // Activate star animation
+          //       setState(() {
+          //         activateStar = !activateStar;
+          //       });
+          //     },
+          //     child: const Text('Start Star Animation'),
+          //   ),
           buildDotBox(),
         ],
       ),

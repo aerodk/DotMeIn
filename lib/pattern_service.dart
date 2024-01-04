@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PatternService {
-  var nameList = List.of(['Hjerte', 'Kat', 'Solen']);
+  var nameList = List.of(['Hjerte', 'Alberts kat', 'Solen']);
   var patternList = List.of(['''
       .............. 
       ....RR..RR....
