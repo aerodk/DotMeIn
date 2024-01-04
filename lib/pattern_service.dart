@@ -65,10 +65,10 @@ class PatternService {
         ),
       );
 
-      return PatternData(patternColors, width, height);
+      return PatternData(patternColors, width, height, pattern);
     } else {
       // Returner et tomt mønster, hvis mønsteret ikke findes
-      return PatternData([], 0, 0);
+      return PatternData([], 0, 0, '');
     }
   }
 
@@ -93,9 +93,10 @@ class PatternService {
 }
 
 class PatternData {
+  final String title;
   final List<List<Color>> patternColors;
   final int width;
   final int height;
 
-  PatternData(this.patternColors, this.width, this.height);
+  PatternData(this.patternColors, this.width, this.height, this.title);
 }
