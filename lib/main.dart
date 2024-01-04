@@ -24,7 +24,8 @@ class MyHomePage extends StatefulWidget {
   MyHomePageState createState() => MyHomePageState();
 }
 
-class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin  {
+class MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -33,7 +34,7 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
   int rowCount = 12;
   int colCount = 12;
   PatternService patternService = PatternService();
-  PatternData selectedPatternData = PatternData([], 0, 0);
+  PatternData selectedPatternData = PatternData([], 0, 0, '');
 
   // Define a 2D list to hold cell colors
   late List<List<Color>> gridColors;
@@ -51,21 +52,13 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2), // Juster varigheden efter dine præferencer
+      duration: const Duration(
+          seconds: 2), // Juster varigheden efter dine præferencer
     );
 
-    // Lyt efter ændringer i status
-    // _controller.addStatusListener((status) {
-    //   if (status == AnimationStatus.completed) {
-    //     Hvis animationen er færdig, nulstil og start igen
-        // _controller.reset();
-        // _controller.forward();
-      // }
-    // });
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller);
     _controller.repeat(reverse: true);
   }
-
 
   @override
   void dispose() {
@@ -84,7 +77,7 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
           Wrap(
             children: [
               buildColorPicker(),
-              buildPreview(),
+              buildPreview(selectedPatternData),
             ],
           ),
           Row(
@@ -107,10 +100,22 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
                   showPatternDialog();
                 },
                 child: const Text('Vælg mønster'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    gridColors = List.generate(
+                      rowCount,
+                      (index) =>
+                          List.generate(colCount, (index) => Colors.grey),
+                    );
+                  });
+                },
+                child: const Text('Ryd'),
               )
             ],
           ),
-          // if (kDebugMode)
+          // if (kDebugMode) // Re-enable to activate animation star
           //   ElevatedButton(
           //     onPressed: () {
           //       // Activate star animation
@@ -164,25 +169,35 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
 
   void showPatternDialog() {
     List<String> availablePatterns = patternService.getAvailablePatterns();
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text('Vælg mønster'),
-          children: [
-            for (String patternName in availablePatterns)
-              ListTile(
-                title: Text(patternName),
-                onTap: () {
-                  resetCompare();
-                  setPattern(patternService.getPattern(patternName));
-                  compareActive = activateStar = false;
-                  Navigator.pop(context);
-                },
-              ),
-            // Tilføj eventuelle andre mønstre her
-          ],
+        return AlertDialog(
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 300,
+            child: Wrap(
+              children: availablePatterns.map((pattern) {
+                return GestureDetector(
+                  onTap: () {
+                    resetCompare();
+                    setPattern(patternService.getPattern(pattern));
+                    compareActive = activateStar = false;
+                    Navigator.pop(context);
+                  },
+                  child: Column(
+                    children: [
+                      Text(pattern),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        child: buildPreview(patternService.getPattern(pattern)),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         );
       },
     );
@@ -269,10 +284,13 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
             int col = index % colCount;
 
             return activateStar && gridColors[row][col] == Colors.white54
-                ? AnimatedBuilder(animation: _animation,
-                builder: (context, build) { return
-                  CustomPaint(painter: StarPainter(_animation.value), size: const Size(40,40));
-                  } )
+                ? AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, build) {
+                      return CustomPaint(
+                          painter: StarPainter(_animation.value),
+                          size: const Size(40, 40));
+                    })
                 : Container(
                     margin: const EdgeInsets.all(2),
                     color: gridColors[row][col],
@@ -298,14 +316,17 @@ class MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMi
     );
   }
 
-  Widget buildPreview() {
+  Widget buildPreview(PatternData selectedPatternData) {
     int width = selectedPatternData.width > 0 ? selectedPatternData.width : 1;
     int height =
         selectedPatternData.height > 0 ? selectedPatternData.height : 1;
 
+    // Juster faktorerne for at ændre størrelsen af miniaturebilledet
+    double boxSize = 15.0; // Skift denne værdi efter behov
+
     return SizedBox(
-      height: height.toDouble() * 20.0,
-      width: width.toDouble() * 20.0,
+      height: height.toDouble() * boxSize,
+      width: width.toDouble() * boxSize,
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: width,
