@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PatternService {
-  var nameList = List.of(['Hjerte', 'Solen']);
+  var nameList = List.of(['Hjerte', 'Kat', 'Solen']);
   var patternList = List.of(['''
       .............. 
       ....RR..RR....
@@ -14,6 +14,20 @@ class PatternService {
       ......RRR..... 
       .......R...... 
       ..............
+      '''
+      ,
+      '''
+      ..B..B........ 
+      ..YBBY........              
+      .BBBBBB.......
+      ..BKKB......B.
+      ...RR........B
+      ...BB........B
+      ...BBBBBBBBBBB
+      ....BBBBBBBBB. 
+      .....BBBBBBB.. 
+      ......BBBBB... 
+      GGGGGGGBBGBGGG
       '''
       ,
     '''
@@ -66,6 +80,12 @@ class PatternService {
         return Colors.yellow;
       case 'O':
         return Colors.orange;
+      case 'G':
+        return Colors.green;
+      case 'B':
+        return Colors.blue;
+      case 'K':
+        return Colors.black;
       default:
         return Colors.grey;
     }
