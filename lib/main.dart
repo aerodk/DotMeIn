@@ -153,7 +153,7 @@ class MyHomePageState extends State<MyHomePage>
       canPressButton = false;
 
       // Start en timer, der aktiverer knappen efter 5 sekunder
-      Timer(Duration(seconds: 5), () {
+      Timer(const Duration(seconds: 5), () {
         setState(() {
           canPressButton = true;
         });
