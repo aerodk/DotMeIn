@@ -78,41 +78,47 @@ class MyHomePageState extends State<MyHomePage>
             children: [
               buildColorPicker(),
               buildPreview(selectedPatternData),
-            ],
-          ),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  compareActive = !compareActive;
-                  if (compareActive) {
-                    comparePatterns();
-                  } else {
-                    resetCompare();
-                    setState(() {});
-                  }
-                },
-                child: const Text('Sammenlign mønstre'),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      compareActive = !compareActive;
+                      if (compareActive) {
+                        comparePatterns();
+                      } else {
+                        resetCompare();
+                        setState(() {});
+                      }
+                    },
+                    child: const Icon(
+                      Icons.compare,
+                      size: 50,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Open dialog for choosing pattern
+                      showPatternDialog();
+                    },
+                    child: const Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 50,
+                    ),
+                  ), // To choose a pattern
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        gridColors = List.generate(
+                          rowCount,
+                          (index) =>
+                              List.generate(colCount, (index) => Colors.grey),
+                        );
+                      });
+                    },
+                    child: const Icon(Icons.cleaning_services, size: 50),
+                  )
+                ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Åbn dialogen for at vælge mønster
-                  showPatternDialog();
-                },
-                child: const Text('Vælg mønster'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    gridColors = List.generate(
-                      rowCount,
-                      (index) =>
-                          List.generate(colCount, (index) => Colors.grey),
-                    );
-                  });
-                },
-                child: const Text('Ryd'),
-              )
             ],
           ),
           // if (kDebugMode) // Re-enable to activate animation star
@@ -324,24 +330,31 @@ class MyHomePageState extends State<MyHomePage>
     // Juster faktorerne for at ændre størrelsen af miniaturebilledet
     double boxSize = 15.0; // Skift denne værdi efter behov
 
-    return SizedBox(
-      height: height.toDouble() * boxSize,
-      width: width.toDouble() * boxSize,
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: width,
-        ),
-        itemBuilder: (context, index) {
-          int row = index ~/ width;
-          int col = index % width;
+    return GestureDetector(
+      // onTap: () {
+      //   setState(() {
+      //     showPatternDialog();
+      //   });
+      // },
+      child: SizedBox(
+        height: height.toDouble() * boxSize,
+        width: width.toDouble() * boxSize,
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: width,
+          ),
+          itemBuilder: (context, index) {
+            int row = index ~/ width;
+            int col = index % width;
 
-          return Container(
-            margin: const EdgeInsets.all(2),
-            color: selectedPatternData.patternColors[row][col],
-          );
-        },
-        itemCount: height * width,
-        physics: const NeverScrollableScrollPhysics(),
+            return Container(
+              margin: const EdgeInsets.all(2),
+              color: selectedPatternData.patternColors[row][col],
+            );
+          },
+          itemCount: height * width,
+          physics: const NeverScrollableScrollPhysics(),
+        ),
       ),
     );
   }
