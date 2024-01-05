@@ -34,17 +34,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
-
-#      - name: Move to Publish Repository
-#        if: github.ref == 'refs/heads/main' && success()
-#        run: |
-#          git clone https://github.com/aerodk/aerodk.github.io.git tmp-repo
-#          git config --global user.email "action@github.com"
-#          git config --global user.name "GitHub Action"
-#          cd tmp-repo
-#          git switch -c "release-dotmein-$(date +'%Y%m%d%H%M%S')"
-#          cp -r ../build/web/* dot/
-#          git add .
-#          git remote set-url origin https://aerodk:${{ secrets.GITHUB_TOKEN}}@github.com/aerodk/aerodk.github.io.git
-#          git commit -m "Release @ $(date +'%Y%m%d%H%M%S')_${{ github.run_number }}"
-#          git push --set-upstream origin "release-dotmein-$(date +'%Y%m%d%H%M%S')"

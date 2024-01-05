@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  bool canPressButton = true;
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -78,41 +81,54 @@ class MyHomePageState extends State<MyHomePage>
             children: [
               buildColorPicker(),
               buildPreview(selectedPatternData),
-            ],
-          ),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  compareActive = !compareActive;
-                  if (compareActive) {
-                    comparePatterns();
-                  } else {
-                    resetCompare();
-                    setState(() {});
-                  }
-                },
-                child: const Text('Sammenlign mønstre'),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      compareActive = !compareActive;
+                      if (compareActive) {
+                        comparePatterns();
+                      } else {
+                        setState(() {
+                          resetCompare();
+                        });
+                      }
+                    },
+                    child: const Icon(
+                      Icons.compare,
+                      size: 50,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Open dialog for choosing pattern
+                      showPatternDialog();
+                    },
+                    child: const Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 50,
+                    ),
+                  ), // To choose a pattern
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        gridColors = List.generate(
+                          rowCount,
+                          (index) =>
+                              List.generate(colCount, (index) => Colors.grey),
+                        );
+                        helpOut(selectedPatternData);
+                        compareForCorrect();
+                      });
+                    },
+                    child: const Icon(Icons.cleaning_services, size: 50),
+                  ), // To choose a pattern
+                  ElevatedButton(
+                    onPressed: canPressButton ? handleButtonPress : null,
+                    child: const Icon(Icons.help, size: 50),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  // Åbn dialogen for at vælge mønster
-                  showPatternDialog();
-                },
-                child: const Text('Vælg mønster'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    gridColors = List.generate(
-                      rowCount,
-                      (index) =>
-                          List.generate(colCount, (index) => Colors.grey),
-                    );
-                  });
-                },
-                child: const Text('Ryd'),
-              )
             ],
           ),
           // if (kDebugMode) // Re-enable to activate animation star
@@ -131,9 +147,27 @@ class MyHomePageState extends State<MyHomePage>
     );
   }
 
+  void handleButtonPress() {
+    setState(() {
+      // Indstil knappen som ikke trykbar
+      canPressButton = false;
+
+      // Start en timer, der aktiverer knappen efter 5 sekunder
+      Timer(const Duration(seconds: 5), () {
+        setState(() {
+          canPressButton = true;
+        });
+      });
+
+      // Implementer logik for knaptryk
+      helpOut(selectedPatternData);
+      compareForCorrect();
+    });
+  }
   MyHomePageState() {
     // Initialize
     patternSelect(patternService.getPattern("Solen"));
+    helpOut(selectedPatternData);
     resetCompare();
   }
 
@@ -145,7 +179,7 @@ class MyHomePageState extends State<MyHomePage>
   void setPattern(PatternData patternData) {
     setState(() {
       patternSelect(patternData);
-      // Opdater rowCount og colCount her, så de har de rigtige værdier
+      // Opdater rowCount og colCount here, so they have the correct amounts
       rowCount = patternData.height;
       colCount = patternData.width;
       // Opdater gridColors og correctness med de nye rowCount og colCount
@@ -154,7 +188,30 @@ class MyHomePageState extends State<MyHomePage>
         (index) => List.generate(colCount, (index) => Colors.grey),
       );
       correctness = resetCompare();
+
+      helpOut(patternData);
     });
+  }
+
+  void helpOut(PatternData patternData) {
+    int help = 4;
+    // Sæt farverne for de første fire ikke-hvide firkanter
+    outer: for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        if (gridColors[row][col] == Colors.grey &&
+            patternData.patternColors[row][col] == Colors.white54) {
+          gridColors[row][col] = patternData.patternColors[row][col];
+        }
+        if (patternData.patternColors[row][col] != Colors.white54 &&
+            gridColors[row][col] != patternData.patternColors[row][col]) {
+          gridColors[row][col] = patternData.patternColors[row][col];
+          help--;
+          if(help <=0) {
+            break outer;
+          }
+        }
+      }
+    }
   }
 
   void patternSelect(PatternData patternData) {
@@ -322,26 +379,33 @@ class MyHomePageState extends State<MyHomePage>
         selectedPatternData.height > 0 ? selectedPatternData.height : 1;
 
     // Juster faktorerne for at ændre størrelsen af miniaturebilledet
-    double boxSize = 15.0; // Skift denne værdi efter behov
+    double boxSize = 25.0; // Skift denne værdi efter behov
 
-    return SizedBox(
-      height: height.toDouble() * boxSize,
-      width: width.toDouble() * boxSize,
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: width,
+    return GestureDetector(
+      // onTap: () {
+      //   setState(() {
+      //     showPatternDialog();
+      //   });
+      // },
+      child: SizedBox(
+        height: height.toDouble() * boxSize,
+        width: width.toDouble() * boxSize,
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: width,
+          ),
+          itemBuilder: (context, index) {
+            int row = index ~/ width;
+            int col = index % width;
+
+            return Container(
+              margin: const EdgeInsets.all(2),
+              color: selectedPatternData.patternColors[row][col],
+            );
+          },
+          itemCount: height * width,
+          physics: const NeverScrollableScrollPhysics(),
         ),
-        itemBuilder: (context, index) {
-          int row = index ~/ width;
-          int col = index % width;
-
-          return Container(
-            margin: const EdgeInsets.all(2),
-            color: selectedPatternData.patternColors[row][col],
-          );
-        },
-        itemCount: height * width,
-        physics: const NeverScrollableScrollPhysics(),
       ),
     );
   }
@@ -426,8 +490,8 @@ class _ColorCircle extends StatelessWidget {
         onColorChanged(color);
       },
       child: Container(
-        width: 40,
-        height: 40,
+        width: 60,
+        height: 60,
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
