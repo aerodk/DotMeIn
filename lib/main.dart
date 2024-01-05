@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -27,6 +28,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  bool canPressButton = true;
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -116,18 +118,15 @@ class MyHomePageState extends State<MyHomePage>
                               List.generate(colCount, (index) => Colors.grey),
                         );
                         helpOut(selectedPatternData);
+                        compareForCorrect();
                       });
                     },
                     child: const Icon(Icons.cleaning_services, size: 50),
                   ), // To choose a pattern
-                  if(kDebugMode) ElevatedButton (
-                    onPressed: () {
-                      setState(() {
-                        helpOut(selectedPatternData);
-                      });
-                    },
+                  ElevatedButton(
+                    onPressed: canPressButton ? handleButtonPress : null,
                     child: const Icon(Icons.help, size: 50),
-                  )
+                  ),
                 ],
               ),
             ],
@@ -148,6 +147,23 @@ class MyHomePageState extends State<MyHomePage>
     );
   }
 
+  void handleButtonPress() {
+    setState(() {
+      // Indstil knappen som ikke trykbar
+      canPressButton = false;
+
+      // Start en timer, der aktiverer knappen efter 5 sekunder
+      Timer(Duration(seconds: 5), () {
+        setState(() {
+          canPressButton = true;
+        });
+      });
+
+      // Implementer logik for knaptryk
+      helpOut(selectedPatternData);
+      compareForCorrect();
+    });
+  }
   MyHomePageState() {
     // Initialize
     patternSelect(patternService.getPattern("Solen"));
@@ -182,7 +198,12 @@ class MyHomePageState extends State<MyHomePage>
     // Sæt farverne for de første fire ikke-hvide firkanter
     outer: for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
-        if (patternData.patternColors[row][col] != Colors.white54) {
+        if (gridColors[row][col] == Colors.grey &&
+            patternData.patternColors[row][col] == Colors.white54) {
+          gridColors[row][col] = patternData.patternColors[row][col];
+        }
+        if (patternData.patternColors[row][col] != Colors.white54 &&
+            gridColors[row][col] != patternData.patternColors[row][col]) {
           gridColors[row][col] = patternData.patternColors[row][col];
           help--;
           if(help <=0) {
