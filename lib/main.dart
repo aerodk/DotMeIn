@@ -1,5 +1,6 @@
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -86,8 +87,9 @@ class MyHomePageState extends State<MyHomePage>
                       if (compareActive) {
                         comparePatterns();
                       } else {
-                        resetCompare();
-                        setState(() {});
+                        setState(() {
+                          resetCompare();
+                        });
                       }
                     },
                     child: const Icon(
@@ -116,6 +118,14 @@ class MyHomePageState extends State<MyHomePage>
                       });
                     },
                     child: const Icon(Icons.cleaning_services, size: 50),
+                  ), // To choose a pattern
+                  if(!kDebugMode) ElevatedButton (
+                    onPressed: () {
+                      setState(() {
+                        helpOut(selectedPatternData);
+                      });
+                    },
+                    child: const Icon(Icons.help, size: 50),
                   )
                 ],
               ),
@@ -140,6 +150,7 @@ class MyHomePageState extends State<MyHomePage>
   MyHomePageState() {
     // Initialize
     patternSelect(patternService.getPattern("Solen"));
+    helpOut(selectedPatternData);
     resetCompare();
   }
 
@@ -151,7 +162,7 @@ class MyHomePageState extends State<MyHomePage>
   void setPattern(PatternData patternData) {
     setState(() {
       patternSelect(patternData);
-      // Opdater rowCount og colCount her, så de har de rigtige værdier
+      // Opdater rowCount og colCount here, so they have the correct amounts
       rowCount = patternData.height;
       colCount = patternData.width;
       // Opdater gridColors og correctness med de nye rowCount og colCount
@@ -160,7 +171,25 @@ class MyHomePageState extends State<MyHomePage>
         (index) => List.generate(colCount, (index) => Colors.grey),
       );
       correctness = resetCompare();
+
+      helpOut(patternData);
     });
+  }
+
+  void helpOut(PatternData patternData) {
+    int help = 4;
+    // Sæt farverne for de første fire ikke-hvide firkanter
+    outer: for (int row = 0; row < rowCount; row++) {
+      for (int col = 0; col < colCount; col++) {
+        if (patternData.patternColors[row][col] != Colors.white54) {
+          gridColors[row][col] = patternData.patternColors[row][col];
+          help--;
+          if(help <=0) {
+            break outer;
+          }
+        }
+      }
+    }
   }
 
   void patternSelect(PatternData patternData) {
