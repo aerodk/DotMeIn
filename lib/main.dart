@@ -115,11 +115,12 @@ class MyHomePageState extends State<MyHomePage>
                           (index) =>
                               List.generate(colCount, (index) => Colors.grey),
                         );
+                        helpOut(selectedPatternData);
                       });
                     },
                     child: const Icon(Icons.cleaning_services, size: 50),
                   ), // To choose a pattern
-                  if(!kDebugMode) ElevatedButton (
+                  if(kDebugMode) ElevatedButton (
                     onPressed: () {
                       setState(() {
                         helpOut(selectedPatternData);
@@ -357,7 +358,7 @@ class MyHomePageState extends State<MyHomePage>
         selectedPatternData.height > 0 ? selectedPatternData.height : 1;
 
     // Juster faktorerne for at ændre størrelsen af miniaturebilledet
-    double boxSize = 15.0; // Skift denne værdi efter behov
+    double boxSize = 25.0; // Skift denne værdi efter behov
 
     return GestureDetector(
       // onTap: () {
@@ -468,8 +469,8 @@ class _ColorCircle extends StatelessWidget {
         onColorChanged(color);
       },
       child: Container(
-        width: 40,
-        height: 40,
+        width: 60,
+        height: 60,
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
