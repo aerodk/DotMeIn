@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PatternService {
-  var nameList = List.of(['Hjerte', 'Alberts kat', 'Solen']);
+  var nameList = List.of(['Hjerte', 'Alberts kat', 'Solen', 'Blå og gul']);
   var patternList = List.of(['''
       .............. 
       ....RR..RR....
@@ -38,6 +38,23 @@ class PatternService {
     ..OOOOOOOOOO..
     ....OOOOOO....
     ......OO......
+    ..............
+    ''',
+    '''
+    ..............
+    .BBBBBBBBBBBB.
+    .YYYYYYYYYYYY.
+    .BBBBBBBBBBBB.
+    .YYYYYYYYYYYY.
+    .BBBBBBBBBBBB.
+    .YYYYYYYYYYYY.
+    .BBBBBBBBBBBB.
+    .YYYYYYYYYYYY.
+    .BBBBBBBBBBBB.
+    .YYYYYYYYYYYY.
+    .BBBBBBBBBBBB.
+    .YYYYYYYYYYYY.
+    .BBBBBBBBBBBB.
     ..............
     '''
   ]);
