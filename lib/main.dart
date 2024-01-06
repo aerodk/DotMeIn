@@ -91,7 +91,7 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   List<Widget> buildButtons() {
-    final double iconSize = MediaQuery.of(context).size.width * 0.05;
+    final double iconSize = MediaQuery.of(context).size.width * 0.03;
     return [ElevatedButton(
         onPressed: () {
           compareActive = !compareActive;
