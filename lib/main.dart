@@ -224,27 +224,29 @@ class MyHomePageState extends State<MyHomePage>
         return AlertDialog(
           content: SizedBox(
             width: double.maxFinite,
-            height: 300,
-            child: Wrap(
-              children: availablePatterns.map((pattern) {
-                return GestureDetector(
-                  onTap: () {
-                    resetCompare();
-                    setPattern(patternService.getPattern(pattern));
-                    compareActive = activateStar = false;
-                    Navigator.pop(context);
-                  },
-                  child: Column(
-                    children: [
-                      Text(pattern),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: buildPreview(patternService.getPattern(pattern)),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
+            // height: 300,
+            child: SingleChildScrollView(
+              child: Wrap(
+                children: availablePatterns.map((pattern) {
+                  return GestureDetector(
+                    onTap: () {
+                      resetCompare();
+                      setPattern(patternService.getPattern(pattern));
+                      compareActive = activateStar = false;
+                      Navigator.pop(context);
+                    },
+                    child: Column(
+                      children: [
+                        Text(pattern),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: buildPreview(patternService.getPattern(pattern)),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ),
         );
