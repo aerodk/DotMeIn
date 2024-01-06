@@ -74,77 +74,67 @@ class MyHomePageState extends State<MyHomePage>
     return Scaffold(
       appBar: AppBar(
         title: const Text('DotMeIn'),
+        actions: buildButtons(),
       ),
       body: Column(
         children: [
+          buildDotBox(),
           Wrap(
             children: [
-              buildColorPicker(),
               buildPreview(selectedPatternData),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      compareActive = !compareActive;
-                      if (compareActive) {
-                        comparePatterns();
-                      } else {
-                        setState(() {
-                          resetCompare();
-                        });
-                      }
-                    },
-                    child: const Icon(
-                      Icons.compare,
-                      size: 50,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Open dialog for choosing pattern
-                      showPatternDialog();
-                    },
-                    child: const Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      size: 50,
-                    ),
-                  ), // To choose a pattern
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        gridColors = List.generate(
-                          rowCount,
-                          (index) =>
-                              List.generate(colCount, (index) => Colors.grey),
-                        );
-                        helpOut(selectedPatternData);
-                        compareForCorrect();
-                      });
-                    },
-                    child: const Icon(Icons.cleaning_services, size: 50),
-                  ), // To choose a pattern
-                  ElevatedButton(
-                    onPressed: canPressButton ? handleButtonPress : null,
-                    child: const Icon(Icons.help, size: 50),
-                  ),
-                ],
-              ),
+              buildColorPicker(),
             ],
           ),
-          // if (kDebugMode) // Re-enable to activate animation star
-          //   ElevatedButton(
-          //     onPressed: () {
-          //       // Activate star animation
-          //       setState(() {
-          //         activateStar = !activateStar;
-          //       });
-          //     },
-          //     child: const Text('Start Star Animation'),
-          //   ),
-          buildDotBox(),
         ],
       ),
     );
+  }
+
+  List<Widget> buildButtons() {
+    final double iconSize = MediaQuery.of(context).size.width * 0.05;
+    return [ElevatedButton(
+        onPressed: () {
+          compareActive = !compareActive;
+          if (compareActive) {
+            comparePatterns();
+          } else {
+            setState(() {
+              resetCompare();
+            });
+          }
+        },
+        child: Icon(
+          Icons.compare,
+          size: iconSize,
+        ),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          // Open dialog for choosing pattern
+          showPatternDialog();
+        },
+        child: Icon(
+          Icons.arrow_forward_ios_outlined,
+          size: iconSize,
+        ),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            gridColors = List.generate(
+              rowCount,
+              (index) => List.generate(colCount, (index) => Colors.grey),
+            );
+            helpOut(selectedPatternData);
+            compareForCorrect();
+          });
+        },
+        child: Icon(Icons.cleaning_services, size: iconSize),
+      ),
+      ElevatedButton(
+          onPressed: canPressButton ? handleButtonPress : null,
+          child: Icon(Icons.help, size: iconSize))
+    ];
   }
 
   void handleButtonPress() {
@@ -164,6 +154,7 @@ class MyHomePageState extends State<MyHomePage>
       compareForCorrect();
     });
   }
+
   MyHomePageState() {
     // Initialize
     patternSelect(patternService.getPattern("Solen"));
@@ -196,7 +187,8 @@ class MyHomePageState extends State<MyHomePage>
   void helpOut(PatternData patternData) {
     int help = 4;
     // Sæt farverne for de første fire ikke-hvide firkanter
-    outer: for (int row = 0; row < rowCount; row++) {
+    outer:
+    for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
         if (gridColors[row][col] == Colors.grey &&
             patternData.patternColors[row][col] == Colors.white54) {
@@ -206,7 +198,7 @@ class MyHomePageState extends State<MyHomePage>
             gridColors[row][col] != patternData.patternColors[row][col]) {
           gridColors[row][col] = patternData.patternColors[row][col];
           help--;
-          if(help <=0) {
+          if (help <= 0) {
             break outer;
           }
         }
@@ -232,27 +224,29 @@ class MyHomePageState extends State<MyHomePage>
         return AlertDialog(
           content: SizedBox(
             width: double.maxFinite,
-            height: 300,
-            child: Wrap(
-              children: availablePatterns.map((pattern) {
-                return GestureDetector(
-                  onTap: () {
-                    resetCompare();
-                    setPattern(patternService.getPattern(pattern));
-                    compareActive = activateStar = false;
-                    Navigator.pop(context);
-                  },
-                  child: Column(
-                    children: [
-                      Text(pattern),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        child: buildPreview(patternService.getPattern(pattern)),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
+            // height: 300,
+            child: SingleChildScrollView(
+              child: Wrap(
+                children: availablePatterns.map((pattern) {
+                  return GestureDetector(
+                    onTap: () {
+                      resetCompare();
+                      setPattern(patternService.getPattern(pattern));
+                      compareActive = activateStar = false;
+                      Navigator.pop(context);
+                    },
+                    child: Column(
+                      children: [
+                        Text(pattern),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          child: buildPreview(patternService.getPattern(pattern)),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ),
         );
@@ -460,7 +454,7 @@ class SimpleColorPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: 8.0, // Juster afstanden mellem farvecirklerne efter behov
+      spacing: 6.0, // Juster afstanden mellem farvecirklerne efter behov
       children: [
         _ColorCircle(Colors.black, onColorChanged, selectedColor),
         _ColorCircle(Colors.white54, onColorChanged, selectedColor),
