@@ -74,6 +74,7 @@ class MyHomePageState extends State<MyHomePage>
     return Scaffold(
       appBar: AppBar(
         title: const Text('DotMeIn'),
+        actions: buildButtons(),
       ),
       body: Column(
         children: [
@@ -82,48 +83,6 @@ class MyHomePageState extends State<MyHomePage>
             children: [
               buildPreview(selectedPatternData),
               buildColorPicker(),
-              ElevatedButton(
-                onPressed: () {
-                  compareActive = !compareActive;
-                  if (compareActive) {
-                    comparePatterns();
-                  } else {
-                    setState(() {
-                      resetCompare();
-                    });
-                  }
-                },
-                child: const Icon(
-                  Icons.compare,
-                  size: 50,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Open dialog for choosing pattern
-                  showPatternDialog();
-                },
-                child: const Icon(
-                  Icons.arrow_forward_ios_outlined,
-                  size: 50,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    gridColors = List.generate(
-                      rowCount,
-                          (index) => List.generate(colCount, (index) => Colors.grey),
-                    );
-                    helpOut(selectedPatternData);
-                    compareForCorrect();
-                  });
-                },
-                child: const Icon(Icons.cleaning_services, size: 50),
-              ),
-              ElevatedButton(
-                  onPressed: canPressButton ? handleButtonPress : null,
-                  child: const Icon(Icons.help, size: 50)),
             ],
           ),
         ],
@@ -131,9 +90,9 @@ class MyHomePageState extends State<MyHomePage>
     );
   }
 
-  buildButtons() {
-    return Row(children: [
-      ElevatedButton(
+  List<Widget> buildButtons() {
+    final double iconSize = MediaQuery.of(context).size.width * 0.05;
+    return [ElevatedButton(
         onPressed: () {
           compareActive = !compareActive;
           if (compareActive) {
@@ -144,9 +103,9 @@ class MyHomePageState extends State<MyHomePage>
             });
           }
         },
-        child: const Icon(
+        child: Icon(
           Icons.compare,
-          size: 50,
+          size: iconSize,
         ),
       ),
       ElevatedButton(
@@ -154,9 +113,9 @@ class MyHomePageState extends State<MyHomePage>
           // Open dialog for choosing pattern
           showPatternDialog();
         },
-        child: const Icon(
+        child: Icon(
           Icons.arrow_forward_ios_outlined,
-          size: 50,
+          size: iconSize,
         ),
       ),
       ElevatedButton(
@@ -170,12 +129,12 @@ class MyHomePageState extends State<MyHomePage>
             compareForCorrect();
           });
         },
-        child: const Icon(Icons.cleaning_services, size: 50),
+        child: Icon(Icons.cleaning_services, size: iconSize),
       ),
       ElevatedButton(
           onPressed: canPressButton ? handleButtonPress : null,
-          child: const Icon(Icons.help, size: 50))
-    ]);
+          child: Icon(Icons.help, size: iconSize))
+    ];
   }
 
   void handleButtonPress() {
