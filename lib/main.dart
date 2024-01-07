@@ -410,7 +410,7 @@ class MyHomePageState extends State<MyHomePage>
       ),
     ) : Wrap(
       children: [
-        Container(
+        SizedBox(
           width: 200,
           child: Slider(
             value: max(minCount, rowCount.toDouble()),
@@ -427,8 +427,8 @@ class MyHomePageState extends State<MyHomePage>
             },
           ),
         ),
-        SizedBox(height: 20),
-        Container(
+        const SizedBox(height: 20),
+        SizedBox(
           width: 200,
           child: Slider(
             value: max(minCount, colCount.toDouble()),
@@ -445,7 +445,7 @@ class MyHomePageState extends State<MyHomePage>
             },
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Text('rowCount: $rowCount, colCount: $colCount'),
       ],
     );
