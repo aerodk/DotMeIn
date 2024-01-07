@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
@@ -81,7 +82,7 @@ class MyHomePageState extends State<MyHomePage>
           buildDotBox(),
           Wrap(
             children: [
-              buildPreview(selectedPatternData),
+              buildPreview(selectedPatternData, 0.04), // x % of screen size
               buildColorPicker(),
             ],
           ),
@@ -91,7 +92,7 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   List<Widget> buildButtons() {
-    final double iconSize = MediaQuery.of(context).size.width * 0.05;
+    final double iconSize = MediaQuery.of(context).size.width * 0.03;
     return [ElevatedButton(
         onPressed: () {
           compareActive = !compareActive;
@@ -224,7 +225,7 @@ class MyHomePageState extends State<MyHomePage>
         return AlertDialog(
           content: SizedBox(
             width: double.maxFinite,
-            // height: 300,
+            height: 300,
             child: SingleChildScrollView(
               child: Wrap(
                 children: availablePatterns.map((pattern) {
@@ -240,7 +241,7 @@ class MyHomePageState extends State<MyHomePage>
                         Text(pattern),
                         Container(
                           padding: const EdgeInsets.all(8),
-                          child: buildPreview(patternService.getPattern(pattern)),
+                          child: buildPreview(patternService.getPattern(pattern), 0.1),
                         ),
                       ],
                     ),
@@ -367,20 +368,15 @@ class MyHomePageState extends State<MyHomePage>
     );
   }
 
-  Widget buildPreview(PatternData selectedPatternData) {
+  Widget buildPreview(PatternData selectedPatternData, double box) {
     int width = selectedPatternData.width > 0 ? selectedPatternData.width : 1;
     int height =
         selectedPatternData.height > 0 ? selectedPatternData.height : 1;
 
     // Juster faktorerne for at ændre størrelsen af miniaturebilledet
-    double boxSize = 25.0; // Skift denne værdi efter behov
+    final double boxSize = min(40, MediaQuery.of(context).size.width * box);
 
     return GestureDetector(
-      // onTap: () {
-      //   setState(() {
-      //     showPatternDialog();
-      //   });
-      // },
       child: SizedBox(
         height: height.toDouble() * boxSize,
         width: width.toDouble() * boxSize,
@@ -479,13 +475,14 @@ class _ColorCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double iconSize = MediaQuery.of(context).size.width * 0.05;
     return GestureDetector(
       onTap: () {
         onColorChanged(color);
       },
       child: Container(
-        width: 60,
-        height: 60,
+        width: iconSize,
+        height: iconSize,
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
