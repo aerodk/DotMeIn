@@ -35,8 +35,8 @@ class MyHomePageState extends State<MyHomePage>
 
   Color selectedColor = Colors.white54; // Initial color
   Color base = Colors.grey;
-  int rowCount = 12;
-  int colCount = 12;
+  int rowCount = 24;
+  int colCount = 24;
   double maxCount = 32;
   double minCount = 2;
   PatternService patternService = PatternService();
@@ -84,7 +84,7 @@ class MyHomePageState extends State<MyHomePage>
           buildDotBox(),
           Wrap(
             children: [
-              buildPreview(selectedPatternData, 0.04), // x % of screen size
+              notZen(selectedPatternData) ? buildPreview(selectedPatternData, 0.04) : buildZen(), // x % of screen size
               buildColorPicker(),
             ],
           ),
@@ -391,8 +391,7 @@ class MyHomePageState extends State<MyHomePage>
     // Juster faktorerne for at ændre størrelsen af miniaturebilledet
     final double boxSize = min(40, MediaQuery.of(context).size.width * box);
 
-    return notZen(selectedPatternData)
-        ? GestureDetector(
+    return GestureDetector(
             child: SizedBox(
               height: height.toDouble() * boxSize,
               width: width.toDouble() * boxSize,
@@ -413,8 +412,50 @@ class MyHomePageState extends State<MyHomePage>
                 physics: const NeverScrollableScrollPhysics(),
               ),
             ),
-          )
-        : Wrap(
+          );
+        // : Wrap(
+        //     children: [
+        //       SizedBox(
+        //         width: 200,
+        //         child: Slider(
+        //           value: max(minCount, rowCount.toDouble()),
+        //           min: minCount,
+        //           max: maxCount,
+        //           onChanged: (value) {},
+        //           onChangeEnd: (value) {
+        //             rowCount = value.round();
+        //             colCount = calculateColCount();
+        //             setState(() {
+        //               initGridColors();
+        //             });
+        //           },
+        //         ),
+        //       ),
+        //       const SizedBox(height: 20),
+        //       SizedBox(
+        //         width: 200,
+        //         child: Slider(
+        //           value: max(minCount, colCount.toDouble()),
+        //           min: minCount,
+        //           max: maxCount,
+        //           onChanged: (value) {},
+        //           onChangeEnd: (value) {
+        //             colCount = value.round();
+        //             rowCount = calculateRowCount();
+        //             setState(() {
+        //               initGridColors();
+        //             });
+        //           },
+        //         ),
+        //       ),
+        //       const SizedBox(height: 20),
+        //       Text('rowCount: $rowCount, colCount: $colCount'),
+        //     ],
+        //   );
+  }
+
+  Widget buildZen() {
+    return Wrap(
             children: [
               SizedBox(
                 width: 200,

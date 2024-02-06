@@ -1,16 +1,36 @@
 import 'package:flutter/material.dart';
 
 class PatternService {
-  static const String zenMode = 'Zen';
+  static const String zenMode =
+      'Zen'; // Tilføj static for at gøre det til en klassekonstant
 
-  var nameList = List.of([zenMode
-    , 'Hjerte'
-    , 'Alberts kat'
-    , 'Solen'
-    , 'Dannebrog'
-    , 'Blå og gul']);
-  var patternList = List.of(['''.''',
-      '''
+  // Brug statiske konstanter for mønsternavne
+  static const String heartPattern = 'Hjerte';
+  static const String albertsCatPattern = 'Alberts kat';
+  static const String sunPattern = 'Solen';
+  static const String danishFlagPattern = 'Dannebrog';
+  static const String blueAndYellowPattern = 'Blå og gul';
+
+  var nameList = List.of([
+    zenMode,
+    heartPattern,
+    albertsCatPattern,
+    sunPattern,
+    danishFlagPattern,
+    blueAndYellowPattern
+  ]);
+
+  static var patternList = List.of([
+    '''
+  ............
+  .KKKKKKKKKK..
+  .......KKK...
+  .....KKK.....
+  ...KKK.......
+  .KKKKKKKKKK..
+  .............
+  ''',
+    '''
       .............. 
       ....RR..RR....
       ...RRRRRRRR...
@@ -22,9 +42,8 @@ class PatternService {
       ......RRR..... 
       .......R...... 
       ..............
-      '''
-      ,
-      '''
+      ''',
+    '''
       ..B..B........ 
       ..YBBY........              
       .BBBBBB.......
@@ -36,8 +55,7 @@ class PatternService {
       .....BBBBBBB.. 
       ......BBBBB... 
       GGGGGGGBBGBGGG
-      '''
-      ,
+      ''',
     '''
     ......OO......
     ....OOOOOO....
@@ -47,16 +65,16 @@ class PatternService {
     ....OOOOOO....
     ......OO......
     ..............
-    '''      ,
+    ''',
     '''
-    ......RR......
-    ......RR......
-    ......RR......
+    ....RR........
+    ....RR........
+    ....RR........
     .RRRRRRRRRRRR.
     .RRRRRRRRRRRR.
-    ......RR......
-    ......RR......
-    ......RR......
+    ....RR........
+    ....RR........
+    ....RR........
     ''',
     '''
     ..............
@@ -84,16 +102,20 @@ class PatternService {
   PatternData getPattern(String pattern) {
     var selectedPatternIndex = nameList.indexOf(pattern);
     if (selectedPatternIndex != -1) {
-      var rows = patternList[selectedPatternIndex].split('\n').map((String row) => row.trim()).toList();
-      var height = rows.length-1;
+      List<String> rows = patternList[selectedPatternIndex]
+          .split('\n')
+          .where((row) => row.trim().isNotEmpty)
+          .map((row) => row.trim())
+          .toList();
+      var height = rows.length;
       var width = rows.isNotEmpty ? rows[0].length : 0;
 
       // Konverter mønsteret til en liste af farver
       List<List<Color>> patternColors = List.generate(
         height,
-            (rowIndex) => List.generate(
+        (rowIndex) => List.generate(
           width,
-              (colIndex) {
+          (colIndex) {
             var indicator = rows[rowIndex][colIndex];
             return indicator == '.' ? Colors.white54 : getColor(indicator);
           },

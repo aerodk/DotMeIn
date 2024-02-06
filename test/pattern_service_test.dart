@@ -12,4 +12,15 @@ void main() {
 
     // Tilføj flere forventede værdier efter behov
   });
+
+  test('Test getPattern method with "Zen"', () {
+    PatternService patternService = PatternService();
+    PatternData patternData = patternService.getPattern("Zen");
+
+    // Forventede værdier baseret på det statiske mønster for "Hjerte"
+    expect(patternData.width, 12);
+    expect(patternData.height, 7);
+
+    // Tilføj flere forventede værdier efter behov
+  });
 }
