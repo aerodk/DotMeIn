@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -37,8 +38,8 @@ class MyHomePageState extends State<MyHomePage>
   Color base = Colors.grey;
   int rowCount = 24;
   int colCount = 24;
-  double maxCount = 32;
-  double minCount = 2;
+  double maxCount = 64;
+  double minCount = 6;
   PatternService patternService = PatternService();
   PatternData selectedPatternData = PatternData([], 0, 0, '');
 
@@ -196,6 +197,10 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   void helpOut(PatternData patternData) {
+    // No help out on zen mode
+    if(!notZen(patternData)) {
+      return;
+    }
     int help = 4;
     // Sæt farverne for de første fire ikke-hvide firkanter
     outer:
@@ -219,9 +224,8 @@ class MyHomePageState extends State<MyHomePage>
 
   void patternSelect(PatternData patternData) {
     if (patternData.title == 'Zen') {
-      rowCount = 12;
-      colCount = 30;
-      selectedPatternData = PatternData([[]], 12, 30, 'Zen');
+      rowCount = colCount = 16;
+      selectedPatternData = PatternData([[]], rowCount, colCount, 'Zen');
     } else {
       rowCount = patternData.height;
       colCount = patternData.width;
@@ -466,7 +470,7 @@ class MyHomePageState extends State<MyHomePage>
                   onChanged: (value) {},
                   onChangeEnd: (value) {
                     rowCount = value.round();
-                    colCount = calculateColCount();
+                    colCount = value.round();
                     setState(() {
                       initGridColors();
                     });
@@ -474,7 +478,7 @@ class MyHomePageState extends State<MyHomePage>
                 ),
               ),
               const SizedBox(height: 20),
-              SizedBox(
+              /*SizedBox(
                 width: 200,
                 child: Slider(
                   value: max(minCount, colCount.toDouble()),
@@ -491,7 +495,7 @@ class MyHomePageState extends State<MyHomePage>
                 ),
               ),
               const SizedBox(height: 20),
-              Text('rowCount: $rowCount, colCount: $colCount'),
+              Text('rowCount: $rowCount, colCount: $colCount'),*/
             ],
           );
   }
@@ -499,13 +503,15 @@ class MyHomePageState extends State<MyHomePage>
   // Calculate colCount based on rowCount to maintain 16:9 ratio
   int calculateColCount() {
     return min(
-        maxCount.toInt(), max(minCount.toInt(), ((rowCount * 9) / 16).round()));
+        maxCount.toInt(), max(minCount.toInt(),((rowCount ).round())));
+        //maxCount.toInt(), max(minCount.toInt(), ((rowCount * 9) / 16).round()));
   }
 
   // Calculate rowCount based on colCount to maintain 16:9 ratio
   int calculateRowCount() {
     return min(
-        maxCount.toInt(), max(minCount.toInt(), ((colCount * 16) / 9).round()));
+        maxCount.toInt(), max(minCount.toInt(), ((colCount.round()))));
+        //maxCount.toInt(), max(minCount.toInt(), ((colCount * 16) / 9).round()));
   }
 
   void comparePatterns() {
