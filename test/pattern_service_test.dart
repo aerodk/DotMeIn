@@ -17,9 +17,9 @@ void main() {
     PatternService patternService = PatternService();
     PatternData patternData = patternService.getPattern("Zen");
 
-    // Forventede værdier baseret på det statiske mønster for "Hjerte"
+    // Forventede værdier baseret på det statiske mønster for "Zen"
     expect(patternData.width, 12);
-    expect(patternData.height, 7);
+    expect(patternData.height, 9);
 
     // Tilføj flere forventede værdier efter behov
   });
