@@ -35,8 +35,10 @@ class MyHomePageState extends State<MyHomePage>
 
   Color selectedColor = Colors.white54; // Initial color
   Color base = Colors.grey;
-  int rowCount = 12;
-  int colCount = 12;
+  int rowCount = 24;
+  int colCount = 24;
+  double maxCount = 64;
+  double minCount = 6;
   PatternService patternService = PatternService();
   PatternData selectedPatternData = PatternData([], 0, 0, '');
 
@@ -82,7 +84,7 @@ class MyHomePageState extends State<MyHomePage>
           buildDotBox(),
           Wrap(
             children: [
-              buildPreview(selectedPatternData, 0.04), // x % of screen size
+              notZen(selectedPatternData) ? buildPreview(selectedPatternData, 0.04) : buildZen(), // x % of screen size
               buildColorPicker(),
             ],
           ),
@@ -93,22 +95,24 @@ class MyHomePageState extends State<MyHomePage>
 
   List<Widget> buildButtons() {
     final double iconSize = MediaQuery.of(context).size.width * 0.03;
-    return [ElevatedButton(
-        onPressed: () {
-          compareActive = !compareActive;
-          if (compareActive) {
-            comparePatterns();
-          } else {
-            setState(() {
-              resetCompare();
-            });
-          }
-        },
-        child: Icon(
-          Icons.compare,
-          size: iconSize,
+    return [
+      if (notZen(selectedPatternData))
+        ElevatedButton(
+          onPressed: () {
+            compareActive = !compareActive;
+            if (compareActive) {
+              comparePatterns();
+            } else {
+              setState(() {
+                resetCompare();
+              });
+            }
+          },
+          child: Icon(
+            Icons.compare,
+            size: iconSize,
+          ),
         ),
-      ),
       ElevatedButton(
         onPressed: () {
           // Open dialog for choosing pattern
@@ -122,20 +126,22 @@ class MyHomePageState extends State<MyHomePage>
       ElevatedButton(
         onPressed: () {
           setState(() {
-            gridColors = List.generate(
-              rowCount,
-              (index) => List.generate(colCount, (index) => Colors.grey),
-            );
+            initGridColors();
             helpOut(selectedPatternData);
             compareForCorrect();
           });
         },
         child: Icon(Icons.cleaning_services, size: iconSize),
       ),
-      ElevatedButton(
-          onPressed: canPressButton ? handleButtonPress : null,
-          child: Icon(Icons.help, size: iconSize))
+      if (notZen(selectedPatternData))
+        ElevatedButton(
+            onPressed: canPressButton ? handleButtonPress : null,
+            child: Icon(Icons.help, size: iconSize))
     ];
+  }
+
+  bool notZen(PatternData ptData) {
+    return ptData.title != PatternService.zenMode;
   }
 
   void handleButtonPress() {
@@ -175,17 +181,25 @@ class MyHomePageState extends State<MyHomePage>
       rowCount = patternData.height;
       colCount = patternData.width;
       // Opdater gridColors og correctness med de nye rowCount og colCount
-      gridColors = List.generate(
-        rowCount,
-        (index) => List.generate(colCount, (index) => Colors.grey),
-      );
+      initGridColors();
       correctness = resetCompare();
 
       helpOut(patternData);
     });
   }
 
+  void initGridColors() {
+    gridColors = List.generate(
+      rowCount,
+      (index) => List.generate(colCount, (index) => Colors.grey),
+    );
+  }
+
   void helpOut(PatternData patternData) {
+    // No help out on zen mode
+    if(!notZen(patternData)) {
+      return;
+    }
     int help = 4;
     // Sæt farverne for de første fire ikke-hvide firkanter
     outer:
@@ -208,17 +222,19 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   void patternSelect(PatternData patternData) {
-    rowCount = patternData.height;
-    colCount = patternData.width;
-    selectedPatternData = patternData;
-    gridColors = List.generate(
-      rowCount,
-      (index) => List.generate(colCount, (index) => Colors.grey),
-    );
+    if (patternData.title == 'Zen') {
+      rowCount = colCount = 16;
+      selectedPatternData = PatternData([[]], rowCount, colCount, 'Zen');
+    } else {
+      rowCount = patternData.height;
+      colCount = patternData.width;
+      selectedPatternData = patternData;
+    }
+    initGridColors();
   }
 
   void showPatternDialog() {
-    List<String> availablePatterns = patternService.getAvailablePatterns();
+    var availablePatterns = patternService.getAvailablePatterns();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -241,7 +257,8 @@ class MyHomePageState extends State<MyHomePage>
                         Text(pattern),
                         Container(
                           padding: const EdgeInsets.all(8),
-                          child: buildPreview(patternService.getPattern(pattern), 0.1),
+                          child: buildPreview(
+                              patternService.getPattern(pattern), 0.1),
                         ),
                       ],
                     ),
@@ -350,7 +367,8 @@ class MyHomePageState extends State<MyHomePage>
                       margin: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         color: gridColors[row][col],
-                        border: !correctness[row][col]
+                        border: notZen(selectedPatternData) &&
+                                !correctness[row][col]
                             ? Border.all(
                                 color: gridColors[row][col] == Colors.red
                                     ? Colors.black12
@@ -377,27 +395,122 @@ class MyHomePageState extends State<MyHomePage>
     final double boxSize = min(40, MediaQuery.of(context).size.width * box);
 
     return GestureDetector(
-      child: SizedBox(
-        height: height.toDouble() * boxSize,
-        width: width.toDouble() * boxSize,
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: width,
-          ),
-          itemBuilder: (context, index) {
-            int row = index ~/ width;
-            int col = index % width;
+            child: SizedBox(
+              height: height.toDouble() * boxSize,
+              width: width.toDouble() * boxSize,
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: width,
+                ),
+                itemBuilder: (context, index) {
+                  int row = index ~/ width;
+                  int col = index % width;
 
-            return Container(
-              margin: const EdgeInsets.all(2),
-              color: selectedPatternData.patternColors[row][col],
-            );
-          },
-          itemCount: height * width,
-          physics: const NeverScrollableScrollPhysics(),
-        ),
-      ),
-    );
+                  return Container(
+                    margin: const EdgeInsets.all(2),
+                    color: selectedPatternData.patternColors[row][col],
+                  );
+                },
+                itemCount: height * width,
+                physics: const NeverScrollableScrollPhysics(),
+              ),
+            ),
+          );
+        // : Wrap(
+        //     children: [
+        //       SizedBox(
+        //         width: 200,
+        //         child: Slider(
+        //           value: max(minCount, rowCount.toDouble()),
+        //           min: minCount,
+        //           max: maxCount,
+        //           onChanged: (value) {},
+        //           onChangeEnd: (value) {
+        //             rowCount = value.round();
+        //             colCount = calculateColCount();
+        //             setState(() {
+        //               initGridColors();
+        //             });
+        //           },
+        //         ),
+        //       ),
+        //       const SizedBox(height: 20),
+        //       SizedBox(
+        //         width: 200,
+        //         child: Slider(
+        //           value: max(minCount, colCount.toDouble()),
+        //           min: minCount,
+        //           max: maxCount,
+        //           onChanged: (value) {},
+        //           onChangeEnd: (value) {
+        //             colCount = value.round();
+        //             rowCount = calculateRowCount();
+        //             setState(() {
+        //               initGridColors();
+        //             });
+        //           },
+        //         ),
+        //       ),
+        //       const SizedBox(height: 20),
+        //       Text('rowCount: $rowCount, colCount: $colCount'),
+        //     ],
+        //   );
+  }
+
+  Widget buildZen() {
+    return Wrap(
+            children: [
+              SizedBox(
+                width: 200,
+                child: Slider(
+                  value: max(minCount, rowCount.toDouble()),
+                  min: minCount,
+                  max: maxCount,
+                  onChanged: (value) {},
+                  onChangeEnd: (value) {
+                    rowCount = value.round();
+                    colCount = value.round();
+                    setState(() {
+                      initGridColors();
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              /*SizedBox(
+                width: 200,
+                child: Slider(
+                  value: max(minCount, colCount.toDouble()),
+                  min: minCount,
+                  max: maxCount,
+                  onChanged: (value) {},
+                  onChangeEnd: (value) {
+                    colCount = value.round();
+                    rowCount = calculateRowCount();
+                    setState(() {
+                      initGridColors();
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text('rowCount: $rowCount, colCount: $colCount'),*/
+            ],
+          );
+  }
+
+  // Calculate colCount based on rowCount to maintain 16:9 ratio
+  int calculateColCount() {
+    return min(
+        maxCount.toInt(), max(minCount.toInt(),((rowCount ).round())));
+        //maxCount.toInt(), max(minCount.toInt(), ((rowCount * 9) / 16).round()));
+  }
+
+  // Calculate rowCount based on colCount to maintain 16:9 ratio
+  int calculateRowCount() {
+    return min(
+        maxCount.toInt(), max(minCount.toInt(), ((colCount.round()))));
+        //maxCount.toInt(), max(minCount.toInt(), ((colCount * 16) / 9).round()));
   }
 
   void comparePatterns() {
@@ -416,23 +529,25 @@ class MyHomePageState extends State<MyHomePage>
   }
 
   void compareForCorrect() {
-    for (int row = 0; row < rowCount; row++) {
-      for (int col = 0; col < colCount; col++) {
-        if (row < selectedPatternData.height &&
-            col < selectedPatternData.width) {
-          if (!(gridColors[row][col] ==
-              selectedPatternData.patternColors[row][col])) {
-            setState(() {
-              activateStar = false;
-            });
-            return;
+    if (notZen(selectedPatternData)) {
+      for (int row = 0; row < rowCount; row++) {
+        for (int col = 0; col < colCount; col++) {
+          if (row < selectedPatternData.height &&
+              col < selectedPatternData.width) {
+            if (!(gridColors[row][col] ==
+                selectedPatternData.patternColors[row][col])) {
+              setState(() {
+                activateStar = false;
+              });
+              return;
+            }
           }
         }
       }
+      setState(() {
+        activateStar = true;
+      });
     }
-    setState(() {
-      activateStar = true;
-    });
   }
 }
 
