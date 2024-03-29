@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:dot_me_in/encodeUtils.dart';
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +114,16 @@ class MyHomePageState extends State<MyHomePage>
             size: iconSize,
           ),
         ),
+      ElevatedButton(
+        onPressed: () {
+          // Open dialog for choosing pattern
+          saveShare();
+        },
+        child: Icon(
+          Icons.save_outlined,
+          size: iconSize,
+        ),
+      ),
       ElevatedButton(
         onPressed: () {
           // Open dialog for choosing pattern
@@ -548,6 +559,10 @@ class MyHomePageState extends State<MyHomePage>
         activateStar = true;
       });
     }
+  }
+
+  void saveShare() {
+    encodePattern(selectedPatternData);
   }
 }
 
