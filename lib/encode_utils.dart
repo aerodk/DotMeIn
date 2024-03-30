@@ -2,6 +2,8 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
 import 'package:dot_me_in/pattern_service.dart';
 
 // Funktion til at kode mønsterdata til en Base64-streng
@@ -19,7 +21,8 @@ String encodePattern(PatternData patternData) {
 
   // Konverter JSON-strengen til bytes
   // Base64-kod bytes
-  String base64Pattern = base64Encode(utf8.encode(jsonPattern));
+  var encode = GZipEncoder().encode(utf8.encode(jsonPattern));
+  String base64Pattern = base64Encode(encode!);
   return base64Pattern;
 }
 
@@ -28,7 +31,11 @@ String encodePattern(PatternData patternData) {
 PatternData decodePattern(String base64Pattern) {
   // Base64-dekod strengen til bytes
   // Konverter bytes til JSON-streng
-  String jsonPattern = utf8.decode(base64Decode(base64Pattern));
+  var base64decode = base64Decode(base64Pattern);
+
+  List<int> decompressedBytes = GZipDecoder().decodeBytes(base64decode);
+
+  String jsonPattern = utf8.decode(decompressedBytes);
   // Afkod JSON-strengen til et map af mønsterdata
   Map<String, dynamic> decodedPatternMap = jsonDecode(jsonPattern);
   // Udtræk mønsterdata fra det afkodede map
