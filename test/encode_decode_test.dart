@@ -1,7 +1,7 @@
 
 // Koden til PatternData og encodePattern/dekodePattern skal indsættes her
 
-import 'package:dot_me_in/encodeUtils.dart';
+import 'package:dot_me_in/encode_utils.dart';
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
