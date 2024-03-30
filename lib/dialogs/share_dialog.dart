@@ -4,18 +4,18 @@ import 'package:flutter/services.dart'; // Importer denne pakke til at få adgan
 class ShareDialog extends StatelessWidget {
   final String outputText;
 
-  const ShareDialog({Key? key, required this.outputText}) : super(key: key);
+  const ShareDialog({super.key, required this.outputText});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Share Pattern'),
+      title: const Text('Share Pattern'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Vælgbar tekst widget til at vise outputtet
-          Container(
+          SizedBox(
             width: 200, // Ønsket bredde
             child: Tooltip(
               message: outputText, // Den fulde tekst
@@ -25,20 +25,20 @@ class ShareDialog extends StatelessWidget {
                 },
                 child: Text(
                   outputText.length > 20
-                      ? outputText.substring(0, 20) + '...'
+                      ? '${outputText.substring(0, 20)}...'
                       : outputText, // Vis de første 20 tegn
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           // Knappen til kopiering af teksten til udklipsholderen
           ElevatedButton(
             onPressed: () {
               _copyToClipboard(outputText, context);
             },
-            child: Text('Kopier'),
+            child: const Text('Kopier'),
           ),
         ],
       ),
@@ -49,7 +49,7 @@ class ShareDialog extends StatelessWidget {
   void _copyToClipboard(String text, BuildContext context) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Tekst kopieret'),
         duration: Duration(seconds: 2),
       ),
