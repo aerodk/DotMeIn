@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class StarWidget extends StatelessWidget {
   final double animationValue;
 
-  const StarWidget({Key? key, required this.animationValue}) : super(key: key);
+  const StarWidget({super.key, required this.animationValue});
 
   @override
   Widget build(BuildContext context) {
