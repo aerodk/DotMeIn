@@ -119,7 +119,7 @@ class PatternService {
           width,
           (colIndex) {
             var indicator = rows[rowIndex][colIndex];
-            return indicator == '.' ? Colors.white54 : getColor(indicator);
+            return indicator == '.' ? Color(Colors.white54.value) : getColor(indicator);
           },
         ),
       );
@@ -134,19 +134,19 @@ class PatternService {
   Color getColor(String indicator) {
     switch (indicator) {
       case 'R':
-        return Colors.red;
+        return Color(Colors.red.value);
       case 'Y':
-        return Colors.yellow;
+        return Color(Colors.yellow.value);
       case 'O':
-        return Colors.orange;
+        return Color(Colors.orange.value);
       case 'G':
-        return Colors.green;
+        return Color(Colors.green.value);
       case 'B':
-        return Colors.blue;
+        return Color(Colors.blue.value);
       case 'K':
-        return Colors.black;
+        return Color(Colors.black.value);
       default:
-        return Colors.grey;
+        return Color(Colors.grey.value);
     }
   }
 }

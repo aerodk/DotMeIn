@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:dot_me_in/dialogs/share_dialog.dart';
+import 'package:dot_me_in/encode_utils.dart';
 import 'package:dot_me_in/pattern_service.dart';
 import 'package:dot_me_in/star_widget.dart';
 import 'package:flutter/material.dart';
@@ -113,6 +115,16 @@ class MyHomePageState extends State<MyHomePage>
             size: iconSize,
           ),
         ),
+      ElevatedButton(
+        onPressed: () {
+          // Open dialog for choosing pattern
+          saveShare(context);
+        },
+        child: Icon(
+          Icons.share_outlined,
+          size: iconSize,
+        ),
+      ),
       ElevatedButton(
         onPressed: () {
           // Open dialog for choosing pattern
@@ -416,45 +428,6 @@ class MyHomePageState extends State<MyHomePage>
               ),
             ),
           );
-        // : Wrap(
-        //     children: [
-        //       SizedBox(
-        //         width: 200,
-        //         child: Slider(
-        //           value: max(minCount, rowCount.toDouble()),
-        //           min: minCount,
-        //           max: maxCount,
-        //           onChanged: (value) {},
-        //           onChangeEnd: (value) {
-        //             rowCount = value.round();
-        //             colCount = calculateColCount();
-        //             setState(() {
-        //               initGridColors();
-        //             });
-        //           },
-        //         ),
-        //       ),
-        //       const SizedBox(height: 20),
-        //       SizedBox(
-        //         width: 200,
-        //         child: Slider(
-        //           value: max(minCount, colCount.toDouble()),
-        //           min: minCount,
-        //           max: maxCount,
-        //           onChanged: (value) {},
-        //           onChangeEnd: (value) {
-        //             colCount = value.round();
-        //             rowCount = calculateRowCount();
-        //             setState(() {
-        //               initGridColors();
-        //             });
-        //           },
-        //         ),
-        //       ),
-        //       const SizedBox(height: 20),
-        //       Text('rowCount: $rowCount, colCount: $colCount'),
-        //     ],
-        //   );
   }
 
   Widget buildZen() {
@@ -477,24 +450,6 @@ class MyHomePageState extends State<MyHomePage>
                 ),
               ),
               const SizedBox(height: 20),
-              /*SizedBox(
-                width: 200,
-                child: Slider(
-                  value: max(minCount, colCount.toDouble()),
-                  min: minCount,
-                  max: maxCount,
-                  onChanged: (value) {},
-                  onChangeEnd: (value) {
-                    colCount = value.round();
-                    rowCount = calculateRowCount();
-                    setState(() {
-                      initGridColors();
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text('rowCount: $rowCount, colCount: $colCount'),*/
             ],
           );
   }
@@ -549,6 +504,16 @@ class MyHomePageState extends State<MyHomePage>
       });
     }
   }
+
+  void saveShare(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ShareDialog(outputText: encodePattern(selectedPatternData)); // Erstat med din outputtekst
+      },
+    );
+  }
+
 }
 
 class SimpleColorPicker extends StatelessWidget {
