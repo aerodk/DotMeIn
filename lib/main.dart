@@ -217,12 +217,12 @@ class MyHomePageState extends State<MyHomePage>
     outer:
     for (int row = 0; row < rowCount; row++) {
       for (int col = 0; col < colCount; col++) {
-        if (gridColors[row][col] == Colors.grey &&
-            patternData.patternColors[row][col] == Colors.white54) {
+        if (gridColors[row][col].value == Colors.grey.value &&
+            patternData.patternColors[row][col].value == Colors.white54.value) {
           gridColors[row][col] = patternData.patternColors[row][col];
         }
-        if (patternData.patternColors[row][col] != Colors.white54 &&
-            gridColors[row][col] != patternData.patternColors[row][col]) {
+        if (patternData.patternColors[row][col].value != Colors.white54.value &&
+            gridColors[row][col].value != patternData.patternColors[row][col].value) {
           gridColors[row][col] = patternData.patternColors[row][col];
           help--;
           if (help <= 0) {
@@ -314,7 +314,7 @@ class MyHomePageState extends State<MyHomePage>
           if (row >= 0 && row < rowCount && col >= 0 && col < colCount) {
             setState(() {
               // Opdater farven på den berørte celle baseret på valgt farve
-              if (gridColors[row][col] == selectedColor) {
+              if (gridColors[row][col].value == selectedColor.value) {
                 gridColors[row][col] = base;
               } else {
                 gridColors[row][col] = selectedColor;
@@ -364,7 +364,7 @@ class MyHomePageState extends State<MyHomePage>
             int row = index ~/ colCount;
             int col = index % colCount;
 
-            return activateStar && gridColors[row][col] == Colors.white54
+            return activateStar && gridColors[row][col].value == Colors.white54.value
                 ? AnimatedBuilder(
                     animation: _animation,
                     builder: (context, build) {
@@ -382,7 +382,7 @@ class MyHomePageState extends State<MyHomePage>
                         border: notZen(selectedPatternData) &&
                                 !correctness[row][col]
                             ? Border.all(
-                                color: gridColors[row][col] == Colors.red
+                                color: gridColors[row][col].value == Colors.red.value
                                     ? Colors.black12
                                     : Colors.red,
                                 width: 2.0,
@@ -473,8 +473,8 @@ class MyHomePageState extends State<MyHomePage>
       for (int col = 0; col < colCount; col++) {
         if (row < selectedPatternData.height &&
             col < selectedPatternData.width) {
-          correctness[row][col] = gridColors[row][col] ==
-              selectedPatternData.patternColors[row][col];
+          correctness[row][col] = gridColors[row][col].value ==
+              selectedPatternData.patternColors[row][col].value;
         } else {
           correctness[row][col] = false;
         }
@@ -489,8 +489,8 @@ class MyHomePageState extends State<MyHomePage>
         for (int col = 0; col < colCount; col++) {
           if (row < selectedPatternData.height &&
               col < selectedPatternData.width) {
-            if (!(gridColors[row][col] ==
-                selectedPatternData.patternColors[row][col])) {
+            if (!(gridColors[row][col].value ==
+                selectedPatternData.patternColors[row][col].value)) {
               setState(() {
                 activateStar = false;
               });
@@ -568,8 +568,8 @@ class _ColorCircle extends StatelessWidget {
           shape: BoxShape.circle,
           color: color,
           border: Border.all(
-            color: selectedColor == color
-                ? selectedColor == Colors.black
+            color: selectedColor.value == color.value
+                ? selectedColor.value == Colors.black.value
                     ? Colors.grey
                     : Colors.black
                 : Colors.transparent,
